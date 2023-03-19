@@ -1,10 +1,11 @@
-# Get fueltech list
-#
-# This functions makes a call to the OpenNEM API and returns a list of
-# fueltechs in OpenNEM backend database.
-# The function returns the list as a dataframe object
-#
-
+#' Get list of fueltechs available in OpenNEM API
+#'
+#' @return Dataframe of fueltechs
+#' @export
+#'
+#' @examples
+#' get_fueltech_list()
+#'
 
 get_fueltech_list <- function(){
 
@@ -17,7 +18,7 @@ get_fueltech_list <- function(){
 
     response_200()
 
-    response_content <- content(response, as = "text")
+    response_content <- httr::content(response, as = "text")
     fueltechs <- jsonlite::fromJSON(response_content) |>
       tidyr::unnest(cols = c())
 

@@ -1,55 +1,67 @@
-
-
-
+#' HTML Response 200 - OK
+#'
+#' @return Message against defined and undefined html response codes
+#' @export
+#'
+#' @examples
+#'
 
 response_200 <- function(){
-
-  # Returns a string for a 200 response code
   return_msg <- "Response 200 - OK"
-
-  return(return_msg)
-
+  message(return_msg)
 }
 
 
+# HTML Response 404 - Not Found
+#' Title
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+
 response_404 <- function(){
-
-  # Return string for a 404 error code
-  # 404 means "not found"
-
   return_msg <- "Response 404 - Not Found.
   There was no response from the server. This suggests input parameters
   may have been wrong, or the URL was incorrect.
   Please check all inputs and try again"
-
-  return(return_msg)
-
+  message(return_msg)
 }
 
 
+# HTML Response 400 - Bad Request
+#' Title
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+
 response_400 <- function(){
-
-  # Return string for a 400 error code
-  # 400 means "bad request"
-
   return_msg <- "Response 400 - Bad request.
   This API call returned bad request.
   Please check all inputs and try again"
-
-  return(return_msg)
-
+  message(return_msg)
 }
 
 
+# HTML Response undefined - return actual error code with generic message
+#' Title
+#'
+#' @param response_code
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+
 response_undefined <- function(response_code){
-
-  # Return string for undefined response
-
-  return_msg <- glue("Response {response_code}.
+  return_msg <- glue::glue("Error - response code {response_code}.
   This API call could not be completed.
   Please check all inputs and try again")
-
-  return(return_msg)
-
+  message(return_msg)
 }
 
