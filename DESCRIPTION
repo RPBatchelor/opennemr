@@ -18,4 +18,5 @@ Imports:
     dplyr,
     httr,
     jsonlite,
-    tidyr
+    tidyr,
+    glue
