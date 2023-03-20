@@ -12,3 +12,6 @@ Message against defined and undefined html response codes
 \description{
 HTML Response 200 - OK
 }
+\examples{
+response_200()
+}

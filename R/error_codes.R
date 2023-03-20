@@ -4,7 +4,7 @@
 #' @export
 #'
 #' @examples
-#'
+#' response_200()
 
 response_200 <- function(){
   return_msg <- "Response 200 - OK"
@@ -15,11 +15,11 @@ response_200 <- function(){
 # HTML Response 404 - Not Found
 #' Title
 #'
-#' @return
+#' @return Message against defined and undefined html response codes
 #' @export
 #'
 #' @examples
-#'
+#' response_404()
 
 response_404 <- function(){
   return_msg <- "Response 404 - Not Found.
@@ -33,11 +33,11 @@ response_404 <- function(){
 # HTML Response 400 - Bad Request
 #' Title
 #'
-#' @return
+#' @return Message against defined and undefined html response codes
 #' @export
 #'
 #' @examples
-#'
+#' response_400()
 
 response_400 <- function(){
   return_msg <- "Response 400 - Bad request.
@@ -52,11 +52,11 @@ response_400 <- function(){
 #'
 #' @param response_code
 #'
-#' @return
+#' @return Message against defined and undefined html response codes
 #' @export
 #'
 #' @examples
-#'
+#' response_undefined()
 
 response_undefined <- function(response_code){
   return_msg <- glue::glue("Error - response code {response_code}.

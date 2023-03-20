@@ -2,13 +2,22 @@
 % Please edit documentation in R/get_interconnector_flow.R
 \name{get_interconnector_flow_by_network}
 \alias{get_interconnector_flow_by_network}
-\title{Title}
+\title{Interconnector flow power data}
 \usage{
 get_interconnector_flow_by_network(network_code, month)
 }
 \arguments{
-\item{month}{}
+\item{network_code}{String defining the network to request data for}
+
+\item{month}{String defining the month of data to request (format "YYYY-MM-DD")}
+}
+\value{
+Dataframe of power flow data for interconnectors
 }
 \description{
-Title
+Interconnector flow power data
+}
+\examples{
+df <- get_interconnector_flow_by_network(network_code = "NEM",
+                                         month = "2023-03-01")
 }

@@ -2,13 +2,25 @@
 % Please edit documentation in R/get_power_by_region_fueltech.R
 \name{get_power_by_fueltech_region}
 \alias{get_power_by_fueltech_region}
-\title{Title}
+\title{Get power data by fueltech and network region}
 \usage{
 get_power_by_fueltech_region(network_code, network_region_code, month)
 }
 \arguments{
-\item{month}{}
+\item{network_code}{String defining the network code to return data for (e.g. "NEM")}
+
+\item{network_region_code}{String defining the network region (e.g. "VIC1")}
+
+\item{month}{String defining the month of data to request (format "YYYY-MM-DD")}
+}
+\value{
+Dataframe of power/price data by fueltech
 }
 \description{
-Title
+Get power data by fueltech and network region
+}
+\examples{
+df <- get_power_by_fueltech_region(network_code = "NEM",
+                                  network_region_code = "VIC1",
+                                 month = "2023-02-01")
 }

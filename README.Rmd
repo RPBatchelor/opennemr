@@ -35,13 +35,30 @@ devtools::install_github("RPBatchelor/opennemr")
 
 This is a basic example which shows you how to solve a common problem:
 
-```{r example}
+Query the OpenNEM API to get a list of fueltechs available.
+
+```{r network list example}
 library(opennemr)
 ## basic example code
 get_network_list()
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+
+Download power and price data from OpenNEM API for a given month and region
+
+```{r power data example}
+
+df <- get_power_by_fueltech_region(
+  network_code = "NEM",
+  network_region_code = "VIC1",
+  month = "2023-03-01"
+)
+
+
+
+```
+
+
 
 ```{r cars}
 summary(cars)

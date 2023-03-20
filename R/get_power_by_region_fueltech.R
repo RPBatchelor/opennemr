@@ -1,45 +1,50 @@
-#' Title
+#' Get power data by fueltech and network region
 #'
-#' @param network_code
-#' @param network_region_code
-#' @param month
+#' @param network_code String defining the network code to return data for (e.g. "NEM")
+#' @param network_region_code String defining the network region (e.g. "VIC1")
+#' @param month String defining the month of data to request (format "YYYY-MM-DD")
 #'
-#' @return
+#' @return Dataframe of power/price data by fueltech
 #' @export
 #'
 #' @examples
+#'df <- get_power_by_fueltech_region(network_code = "NEM",
+#'                                   network_region_code = "VIC1",
+#'                                  month = "2023-02-01")
+
+
 get_power_by_fueltech_region <- function(network_code,
                                          network_region_code,
                                          month){
 
+#
+#   assertthat::assert_that(network_code %in% unique(networks$network_code))
+#   assertthat::assert_that(network_region_code %in% unique(networks$region_code))
 
-  assertthat::assert_that(network_code %in% unique(networks$network_code))
-  assertthat::assert_that(network_region_code %in% unique(networks$region_code))
-
-  endpoint <- glue("https://api.opennem.org.au/stats/power/network/fueltech/{network_code}/{network_region_code}")
+  endpoint <- glue::glue("https://api.opennem.org.au/stats/power/network/fueltech/{network_code}/{network_region_code}")
 
   query_params <- list(
     month = month)
 
-  response <- GET(url = endpoint, query = query_params)
+  response <- httr::GET(url = endpoint, query = query_params)
 
   response$status_code
 
   if(response$status_code == 200){
 
-    response_content <- content(response, as = "text")
-    raw_data <- fromJSON(response_content)
+    response_content <- hrrt::content(response, as = "text")
+    raw_data <- jsonlite::fromJSON(response_content)
 
     fueltech_list <- raw_data$data$code
     type_list <- raw_data$data$type
     unit_list <- raw_data$data$units
 
     data <- raw_data |>
-      bind_rows()
+      dplyr::bind_rows()
 
     data_historical <- raw_data$data$history
 
-    data_fueltech_full <- tibble()
+    data_fueltech_full <- tibble::tibble()
 
     for(ii in 1:length(fueltech_list)){
 
@@ -53,19 +58,19 @@ get_power_by_fueltech_region <- function(network_code,
       interval_ii <- data_historical[[3]][[ii]]
 
       raw_data_ii <- data_historical[ii, ] |>
-        as_tibble() |>
-        unnest(data) |>
-        mutate(fueltech = fueltech_ii)
+        tibble::as_tibble() |>
+        tidyr::unnest(data) |>
+        dplyr::mutate(fueltech = fueltech_ii)
 
       temp_int_ii <- intervals |>
-        filter(interval_human == interval_ii) |>
-        pull(intervals_seq)
+        dplyr::filter(interval_human == interval_ii) |>
+        dplyr::pull(intervals_seq)
 
       date_time_ii <- seq(from = start_date_time_ii,
                           to = end_date_time_ii,
                           by = temp_int_ii) |>
-        as_tibble() |>
-        rename("period_start" = "value")
+        tibble::as_tibble() |>
+        dplyr::rename("period_start" = "value")
 
       raw_data_ii <- raw_data_ii |>
         bind_cols(date_time_ii) |>
@@ -79,13 +84,11 @@ get_power_by_fueltech_region <- function(network_code,
     }
   } else if(response$status_code == 404) {
 
-    print(glue("Error 404. There was no response from the server.
-    This suggests input parameters may have been wrong, or the URL was incorrect.
-    Please try again."))
+    response_404()
+
   } else {
 
-    print(glue("Error {response$status_code}.
-    Unknown error. Please check all inputs and try again"))
+    response_undefined(response$status_code)
   }
 
   return(data_fueltech_full)

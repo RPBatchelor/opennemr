@@ -12,7 +12,13 @@ get_energy_by_station(
 )
 }
 \arguments{
-\item{period}{}
+\item{network_code}{String defining the network code to return data for (e.g. "NEM")}
+
+\item{station_code}{String defining the station to return data fro (e.g. "LOYYANGA")}
+
+\item{interval}{String defining the interval of data}
+
+\item{period}{String defining the period of data to request}
 }
 \value{
 dataframe of energy data (MWh) by station

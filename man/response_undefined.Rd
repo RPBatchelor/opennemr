@@ -9,6 +9,12 @@ response_undefined(response_code)
 \arguments{
 \item{response_code}{}
 }
+\value{
+Message against defined and undefined html response codes
+}
 \description{
 Title
+}
+\examples{
+response_undefined()
 }

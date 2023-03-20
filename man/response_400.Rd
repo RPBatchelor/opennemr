@@ -6,6 +6,12 @@
 \usage{
 response_400()
 }
+\value{
+Message against defined and undefined html response codes
+}
 \description{
 Title
+}
+\examples{
+response_400()
 }

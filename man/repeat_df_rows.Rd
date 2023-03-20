@@ -2,13 +2,21 @@
 % Please edit documentation in R/zzz.R
 \name{repeat_df_rows}
 \alias{repeat_df_rows}
-\title{Title}
+\title{Repeat dataframe n times}
 \usage{
 repeat_df_rows(df, n)
 }
 \arguments{
-\item{n}{}
+\item{df}{A dataframe object}
+
+\item{n}{The number of times to repeat the dataframe rows}
+}
+\value{
+A dataframe with original rows repeated n times
 }
 \description{
-Title
+Repeat dataframe n times
+}
+\examples{
+df <- repeat_df_rows(df, 3)
 }

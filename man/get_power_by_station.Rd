@@ -11,6 +11,24 @@ get_power_by_station(
   period = "7d"
 )
 }
+\arguments{
+\item{network_code}{String defining the network code to return data for (e.g. "NEM")}
+
+\item{station_code}{String defining the station to return data fro (e.g. "LOYYANGA")}
+
+\item{interval}{String defining the interval of data}
+
+\item{period}{String defining the period of data to request}
+}
+\value{
+dataframe power by station
+}
 \description{
 Get historical power by station data
+}
+\examples{
+df <- get_power_by_station(network_code = "NEM",
+                           station_code = "LOYYANGA",
+                           interval = "1d",
+                           period = "7d")
 }
