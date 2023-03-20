@@ -21,6 +21,8 @@ get_power_by_fueltech_region <- function(network_code,
 #   assertthat::assert_that(network_code %in% unique(networks$network_code))
 #   assertthat::assert_that(network_region_code %in% unique(networks$region_code))
 
+  intervals <- get_interval_list()
+
   endpoint <- glue::glue("https://api.opennem.org.au/stats/power/network/fueltech/{network_code}/{network_region_code}")
 
   query_params <- list(
@@ -32,7 +34,7 @@ get_power_by_fueltech_region <- function(network_code,
 
   if(response$status_code == 200){
 
-    response_content <- hrrt::content(response, as = "text")
+    response_content <- httr::content(response, as = "text")
     raw_data <- jsonlite::fromJSON(response_content)
 
     fueltech_list <- raw_data$data$code
@@ -73,13 +75,13 @@ get_power_by_fueltech_region <- function(network_code,
         dplyr::rename("period_start" = "value")
 
       raw_data_ii <- raw_data_ii |>
-        bind_cols(date_time_ii) |>
-        select(-c(start, last)) |>
-        mutate(type = type_ii,
+        dplyr::bind_cols(date_time_ii) |>
+        dplyr::select(-c(start, last)) |>
+        dplyr::mutate(type = type_ii,
                network_region = network_region_code)
 
       data_fueltech_full <- data_fueltech_full |>
-        bind_rows(raw_data_ii)
+        dplyr::bind_rows(raw_data_ii)
 
     }
   } else if(response$status_code == 404) {
