@@ -13,8 +13,10 @@
 get_interconnector_flow_by_network <- function(network_code,
                                                month){
 
-
+  networks <- get_network_list()
   assertthat::assert_that(network_code %in% unique(networks$network_code))
+
+  intervals <- get_interval_list()
 
   endpoint <- glue::glue("https://api.opennem.org.au/stats/flow/network/{network_code}")
 
@@ -24,13 +26,15 @@ get_interconnector_flow_by_network <- function(network_code,
   response <- httr::GET(url = endpoint, query = query_params)
 
 
-  interconnector_data_full <- tibble()
+  interconnector_data_full <- tibble::tibble()
 
 
   if(response$status_code == 200){
 
 
-    response_content <- httr::content(response, as = "text")
+    response_content <- httr::content(response,
+                                      as = "text",
+                                      encoding = "UTF-8")
     raw_data <- jsonlite::fromJSON(response_content)
 
     data <- raw_data$data |>
@@ -86,22 +90,13 @@ get_interconnector_flow_by_network <- function(network_code,
     }
 
 
-  } else if(response$status_code == 404) {
-
-    response_404()
-
   } else {
 
-    response_undefined(response$status_code)
+    response_code_message(response$status_code)
   }
 
   return(interconnector_data_full)
 
-  rm(network_code, month, endpoint, query_params, response, response_content,
-     raw_data, data, interconnectors_list, num_interconnectors,
-     interconnector_data_full, interconnector_ii, start_date_time_ii,
-     end_date_time_ii, interval_ii, temp_int_ii, date_time_ii,
-     interconnector_ii_data)
 
 
 }

@@ -34,7 +34,9 @@ get_power_by_fueltech_region <- function(network_code,
 
   if(response$status_code == 200){
 
-    response_content <- httr::content(response, as = "text")
+    response_content <- httr::content(response,
+                                      as = "text",
+                                      encoding = "UTF-8")
     raw_data <- jsonlite::fromJSON(response_content)
 
     fueltech_list <- raw_data$data$code
@@ -84,23 +86,12 @@ get_power_by_fueltech_region <- function(network_code,
         dplyr::bind_rows(raw_data_ii)
 
     }
-  } else if(response$status_code == 404) {
-
-    response_404()
-
   } else {
 
-    response_undefined(response$status_code)
+    response_code_message(response$status_code)
   }
 
   return(data_fueltech_full)
-
-  rm(network_code, network_region_code, endpoint, query_params, response,
-     response_content, raw_data, fueltech_list, type_list, unit_list,
-     data, data_historical, data_fueltech_full, ii, fueltech_ii, type_ii,
-     start_date_time_ii, end_date_time_ii, interval_ii, temp_int_ii,
-     date_time_ii, raw_data_ii)
-
 
 }
 

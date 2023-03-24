@@ -15,11 +15,6 @@
 convert_on_datetime <- function(dt,
                                 return = "aware"){
 
-  # assertthat::assert_that(return %in% c("aware", "naive"))
-
-  # Extract the components from OpenNEM datetime format
-  # E.g. "2023-03-01T10:00:00Z+10:00"
-
   date_component <- stringr::str_extract(dt, "\\d{4}\\-\\d{2}\\-\\d{2}")
   time_component <- stringr::str_extract(dt, "\\d{2}\\:\\d{2}\\:\\d{2}")
   timezone_component <- stringr::str_extract(dt, "[+-]\\d{2}\\:\\d{2}")

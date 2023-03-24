@@ -15,9 +15,11 @@ get_interval_list <- function(){
 
   if(response$status_code == 200){
 
-    response_200()
+    # response_200()
 
-    response_content <- httr::content(response, as = "text")
+    response_content <- httr::content(response,
+                                      as = "text",
+                                      encoding = "UTF-8")
     intervals <- jsonlite::fromJSON(response_content) |>
       tidyr::unnest(cols = c())
 
@@ -37,13 +39,9 @@ get_interval_list <- function(){
       dplyr::bind_cols("intervals_seq" = intervals_seq)
 
 
-  } else if(response$status_code == 404) {
-
-    response_404()
-
   } else {
 
-    response_undefined(response$status_code)
+    response_code_message(response$status_code)
 
   }
 

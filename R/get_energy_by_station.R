@@ -20,10 +20,16 @@ get_energy_by_station <- function(network_code,
                                   interval = "1d",
                                   period = "7d"){
 
-  # assertthat::assert_that(network_code %in% unique(networks$network_code))
-  # assertthat::assert_that(station_code %in% unique(station_list$station_code))
-  # assertthat::assert_that(interval %in% unique(intervals$interval_human))
-  # assertthat::assert_that(period %in% unique(periods$period_human))
+
+  intervals <- get_interval_list()
+  periods <- get_period_list()
+  networks <- get_network_list()
+  stations <- get_station_list()
+
+  assertthat::assert_that(network_code %in% unique(networks$network_code))
+  assertthat::assert_that(station_code %in% unique(stations$station_code))
+  assertthat::assert_that(interval %in% unique(intervals$interval_human))
+  assertthat::assert_that(period %in% unique(periods$period_human))
 
   endpoint <- glue::glue("https://api.opennem.org.au/stats/energy/station/{network_code}/{station_code}")
 
@@ -35,7 +41,9 @@ get_energy_by_station <- function(network_code,
 
   if(response$status_code == 200){
 
-    response_content <- httr::content(response, as = "text")
+    response_content <- httr::content(response,
+                                      as = "text",
+                                      encoding = "UTF-8")
     raw_data <- jsonlite::fromJSON(response_content)
 
     data <- raw_data$data |>
@@ -94,22 +102,14 @@ get_energy_by_station <- function(network_code,
         dplyr::mutate(data_interval = interval)
 
     }
-  } else if(response$status_code == 404) {
-
-    response_404()
-
   } else {
 
-   response_undefined(response$status_code)
+    response_code_message(response$status_code)
 
   }
 
   return(facility_data_full)
 
-  rm(endpoint, query_params, response, response_content, raw_data, data,
-     data_types, facility_list, facility_data_full, ii, facility_ii,
-     position_vector, start_date_time_ii, end_date_time_ii, a, temp_int_ii,
-     facility_ii_data, date_time_ii)
 
 }
 

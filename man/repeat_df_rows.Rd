@@ -17,6 +17,3 @@ A dataframe with original rows repeated n times
 \description{
 Repeat dataframe n times
 }
-\examples{
-df <- repeat_df_rows(df, 3)
-}

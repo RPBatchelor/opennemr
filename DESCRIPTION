@@ -4,9 +4,10 @@ Title: Access to the OpenNEM API via R
 Version: 0.1.0
 Author: Ryan Batchelor
 Maintainer: Ryan Batchelor <ryanbatchelor87@gmail.com>
-Description: Provides an easy access to the OpenNEM API via R.
-    Several basic function calls are provided to extract power, energy, price,
-    and facility data from OpenNEM (https://opennem.org.au/)
+Description: A package for programatically accessing the OpenNEM API via R. 
+    Several basic functions allow 'opennemr' to access the various API calls provided 
+    by the OpenNEM API (https://opennem.org.au/) to access NEM/WEM data and output
+    data to an R dataframe. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

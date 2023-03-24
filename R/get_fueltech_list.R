@@ -16,9 +16,9 @@ get_fueltech_list <- function(){
 
   if(response$status_code == 200){
 
-    response_200()
-
-    response_content <- httr::content(response, as = "text")
+    response_content <- httr::content(response,
+                                      as = "text",
+                                      encoding = "UTF-8")
     fueltechs <- jsonlite::fromJSON(response_content) |>
       tidyr::unnest(cols = c())
 
@@ -28,13 +28,9 @@ get_fueltech_list <- function(){
                     "fueltech_label" = "label",
                     "renewable_flag" = "renewable")
 
-  } else if(response$status_code == 404) {
-
-    response_404()
-
   } else {
 
-    response_undefined(response$status_code)
+    response_code_message(response$status_code)
 
   }
 
