@@ -1,0 +1,67 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# opennemr
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of opennemr is to provide simple access to the OpenNEM API via R. 
+Each of the endpoints documented at https://api.opennem.org.au/docs have been
+implemented in opennemr. 
+
+## Installation
+
+You can install the development version of opennemr from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("RPBatchelor/opennemr")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+Query the OpenNEM API to get a list of fueltechs available.
+
+```{r network list example}
+library(opennemr)
+## basic example code
+get_network_list()
+```
+
+
+Download power and price data from OpenNEM API for a given month and region
+
+```{r power data example}
+library(ggplot2)
+library(tidyverse)
+
+df <- get_power_by_fueltech_region(
+  network_code = "NEM",
+  network_region_code = "VIC1",
+  month = "2023-03-01"
+)
+
+p <- df |> 
+  filter(period_start >= "2023-03-01" & 
+           period_start < "2023-03-02",
+         type == "power") |> 
+  ggplot() +
+  geom_area(aes(x = period_start, y = data, fill = fueltech))
+p
+
+```
