@@ -20,4 +20,8 @@ Imports:
     httr,
     jsonlite,
     tidyr,
-    glue
+    glue,
+    tibble,
+    assertthat,
+    janitor,
+    stringr
