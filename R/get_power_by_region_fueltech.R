@@ -10,7 +10,7 @@
 #' @examples
 #'df <- get_power_by_fueltech_region(network_code = "NEM",
 #'                                   network_region_code = "VIC1",
-#'                                  month = "2023-02-01")
+#'                                   month = "2023-02-01")
 
 
 get_power_by_fueltech_region <- function(network_code,
@@ -93,7 +93,7 @@ get_power_by_fueltech_region <- function(network_code,
 
   data_fueltech_full <- data_fueltech_full |>
     dplyr::rename("value" = "data") |>
-    dplyr::mutate(value = if_else(fueltech == "battery_charging",
+    dplyr::mutate(value = dplyr::if_else(fueltech == "battery_charging",
                                   -1*value,
                                   value))
 

@@ -2,7 +2,8 @@ Package: opennemr
 Type: Package
 Title: Access to the OpenNEM API via R
 Version: 0.1.0
-Author: Ryan Batchelor
+Authors@R: c(
+  person("Ryan", "Batchelor", role = c("aut", "cre"), email = "ryanbatchelor87@gmail.com"))
 Maintainer: Ryan Batchelor <ryanbatchelor87@gmail.com>
 Description: A package for programatically accessing the OpenNEM API via R. 
     Several basic functions allow 'opennemr' to access the various API calls provided 
@@ -25,3 +26,4 @@ Imports:
     assertthat,
     janitor,
     stringr
+URL: https://github.com/RPBatchelor/opennemr

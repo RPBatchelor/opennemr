@@ -55,8 +55,6 @@ get_interconnector_flow_by_network <- function(network_code,
 
     for(ii in 1:num_interconnectors){
 
-      # ii <- 1
-
       interconnector_ii <- interconnectors_list$code[[ii]]
 
       start_date_time_ii <- raw_data$data$history$start[[ii]]|>
@@ -94,6 +92,9 @@ get_interconnector_flow_by_network <- function(network_code,
 
     response_code_message(response$status_code)
   }
+
+  interconnector_data_full <- interconnector_data_full |>
+    dplyr::rename("value" = "data")
 
   return(interconnector_data_full)
 

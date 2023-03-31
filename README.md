@@ -11,7 +11,7 @@
 The goal of {opennemr} is to provide simple access to the OpenNEM API
 via R.
 
-The OpenNEM project (<https://opennem.org.au>) aims to make Australian
+The [OpenNEM project](https://opennem.org.au) aims to make Australian
 energy network data more accessible to a wider audience through a
 website portal and data access API’s and tools.
 
@@ -20,9 +20,9 @@ Electricity Market (NEM) data \* Wholesale Electricity Market (WEM) data
 \* Australian PV Institute (APVI) data
 
 {opennemr} provides a simple interface for R to access the public API
-provided to OpenNEM. Each of the endpoints documented in the API
-documentation (<https://api.opennem.org.au/docs>) have been implemented
-in opennemr.
+provided to OpenNEM. Each of the endpoints documented in the [API
+documentation](https://api.opennem.org.au/docs) have been implemented in
+opennemr.
 
 ## Installation
 
@@ -40,10 +40,16 @@ devtools::install_github("RPBatchelor/opennemr")
 ## Using {opennemr}
 
 The public OpenNEM API (current version 3.13.2-alpha.10) provides access
-to two types of data: - **Static lists** such as: \* list of stations
-and facilities \* list of networks and network regions \* list of
-fueltechs \* time periods and intervals - **Statistics** such as: \*
-Facility power and energy data \* Interconnector flows
+to two types of data:
+
+- **Static lists** such as:
+  - list of stations and facilities
+  - list of networks and network regions
+  - list of fueltechs
+  - time periods and intervals
+- **Statistics** such as:
+  - Facility power and energy data
+  - Interconnector flows
 
 ### Static lists
 
@@ -114,8 +120,8 @@ str(lya_power)
 #>  $ network     : chr [1:1011] "nem" "nem" "nem" "nem" ...
 #>  $ data_type   : chr [1:1011] "power" "power" "power" "power" ...
 #>  $ units       : chr [1:1011] "MW" "MW" "MW" "MW" ...
-#>  $ value       : num [1:1011] 444 448 460 519 529 ...
-#>  $ period_start: POSIXct[1:1011], format: "2023-03-24 16:00:00" "2023-03-24 16:30:00" ...
+#>  $ value       : num [1:1011] 530 529 529 527 530 ...
+#>  $ period_start: POSIXct[1:1011], format: "2023-03-24 21:30:00" "2023-03-24 22:00:00" ...
 ```
 
 It’s now very simple to chart the power output of each generator at Loy

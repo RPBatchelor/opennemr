@@ -25,7 +25,7 @@ get_station_list <- function(){
       tidyr::unnest_wider(facilities, names_sep = "_") |>
       tidyr::unnest() |>
       janitor::clean_names() |>
-      dplyr::select(all_of(cols_to_keep)) |>
+      dplyr::select(dplyr::all_of(cols_to_keep)) |>
       dplyr::rename("station_id" = "id",
              "station_code" = "code",
              "station_name" = "name",

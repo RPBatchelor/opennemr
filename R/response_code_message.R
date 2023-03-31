@@ -1,7 +1,7 @@
 #' HTML response code handler
 #'
 #' @return Return defined message for each html response code
-#' @export
+#'
 #'
 
 response_code_message <- function(code){
