@@ -24,12 +24,12 @@ devtools::install_github("RPBatchelor/opennemr")
 
 This is a basic example which shows you how to solve a common problem:
 
+Query the OpenNEM API to get a list of fueltechs available.
+
 ``` r
 library(opennemr)
 ## basic example code
 get_network_list()
-#> Response 200 - OK
-#> No encoding supplied: defaulting to UTF-8.
 #> # A tibble: 11 × 6
 #>    network_code country network_label region_code timezone         interval_size
 #>    <chr>        <chr>   <chr>         <chr>       <chr>                    <int>
@@ -46,29 +46,34 @@ get_network_list()
 #> 11 WEM          au      WEM           WEM         Australia/Perth             30
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+Download power and price data from OpenNEM API for a given month and
+region
 
 ``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
+library(ggplot2)
+library(tidyverse)
+#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+#> ✔ tibble  3.1.8     ✔ dplyr   1.1.0
+#> ✔ tidyr   1.3.0     ✔ stringr 1.5.0
+#> ✔ readr   2.1.4     ✔ forcats 1.0.0
+#> ✔ purrr   1.0.1     
+#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+#> ✖ dplyr::filter() masks stats::filter()
+#> ✖ dplyr::lag()    masks stats::lag()
+
+df <- get_power_by_fueltech_region(
+  network_code = "NEM",
+  network_region_code = "VIC1",
+  month = "2023-03-01"
+)
+
+p <- df |> 
+  filter(period_start >= "2023-03-01" & 
+           period_start < "2023-03-02",
+         type == "power") |> 
+  ggplot() +
+  geom_area(aes(x = period_start, y = data, fill = fueltech))
+p
 ```
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this. You could also
-use GitHub Actions to re-render `README.Rmd` every time you push. An
-example workflow can be found here:
-<https://github.com/r-lib/actions/tree/v1/examples>.
-
-You can also embed plots, for example:
-
-<img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+<img src="man/figures/README-power data example-1.png" width="100%" />
