@@ -91,6 +91,12 @@ get_power_by_fueltech_region <- function(network_code,
     response_code_message(response$status_code)
   }
 
+  data_fueltech_full <- data_fueltech_full |>
+    dplyr::rename("value" = "data") |>
+    dplyr::mutate(value = if_else(fueltech == "battery_charging",
+                                  -1*value,
+                                  value))
+
   return(data_fueltech_full)
 
 }
