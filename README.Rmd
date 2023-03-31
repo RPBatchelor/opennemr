@@ -171,7 +171,11 @@ Below charts power by fueltech for a 1 week period
 ```
 
 
-
+## Disclaimer
+The {opennemr} pacakge is not associated with the OpenNEM team, and has been 
+developed independently to facilitate a straightforward access to the API backend
+in R. All data is provided subject to any restrictions and licensing arrangements
+noted on the OpenNEM website. 
 
 
 
