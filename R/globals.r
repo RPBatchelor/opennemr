@@ -12,4 +12,5 @@ utils::globalVariables(c("code",
                          "regions",
                          "fueltech",
                          "value",
-                         "facilities"))
+                         "facilities",
+                         "ChromoteSession"))

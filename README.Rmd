@@ -51,8 +51,8 @@ devtools::install_github("RPBatchelor/opennemr")
 
 ## Using {opennemr}
 
-The public OpenNEM API (current version 3.13.2-alpha.10) provides access to 
-two types of data:
+This package has been built from the public OpenNEM API version 3.14.0, and 
+provides access to two types of data:
 
 + **Static lists** such as:
   + list of stations and facilities

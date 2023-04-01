@@ -25,5 +25,6 @@ Imports:
     tibble,
     assertthat,
     janitor,
-    stringr
+    stringr,
+    chromote
 URL: https://github.com/RPBatchelor/opennemr

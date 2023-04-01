@@ -29,7 +29,7 @@ Get energy data by station
 \examples{
 
 df <- get_energy_by_station(network_code = "NEM",
-                           station_code = "LOYYANGA",
+                            station_code = "LOYYANGA",
                             interval = "1d",
                             period = "7d")
 

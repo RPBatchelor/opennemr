@@ -39,8 +39,8 @@ devtools::install_github("RPBatchelor/opennemr")
 
 ## Using {opennemr}
 
-The public OpenNEM API (current version 3.13.2-alpha.10) provides access
-to two types of data:
+This package has been built from the public OpenNEM API version 3.14.0,
+and provides access to two types of data:
 
 - **Static lists** such as:
   - list of stations and facilities
@@ -61,8 +61,11 @@ First we’ll load the {opennemr} package and the {tidyverse}
 
 ``` r
 library(opennemr)
+#> 
+#> 
 library(tidyverse)
-#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2
+#> ──
 #> ✔ ggplot2 3.4.1     ✔ purrr   1.0.1
 #> ✔ tibble  3.1.8     ✔ dplyr   1.1.0
 #> ✔ tidyr   1.3.0     ✔ stringr 1.5.0
@@ -120,8 +123,8 @@ str(lya_power)
 #>  $ network     : chr [1:1011] "nem" "nem" "nem" "nem" ...
 #>  $ data_type   : chr [1:1011] "power" "power" "power" "power" ...
 #>  $ units       : chr [1:1011] "MW" "MW" "MW" "MW" ...
-#>  $ value       : num [1:1011] 530 529 529 527 530 ...
-#>  $ period_start: POSIXct[1:1011], format: "2023-03-24 21:30:00" "2023-03-24 22:00:00" ...
+#>  $ value       : num [1:1011] 475 458 466 504 525 ...
+#>  $ period_start: POSIXct[1:1011], format: "2023-03-25 18:30:00" "2023-03-25 19:00:00" ...
 ```
 
 It’s now very simple to chart the power output of each generator at Loy
