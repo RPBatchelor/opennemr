@@ -6,9 +6,18 @@
 \usage{
 response_code_message(code)
 }
+\arguments{
+\item{code}{numeric response code from GET request}
+}
 \value{
-Return defined message for each html response code
+HTML response code message for relevant code
 }
 \description{
 HTML response code handler
+}
+\examples{
+\dontrun{
+response_code_message(200)
+}
+
 }

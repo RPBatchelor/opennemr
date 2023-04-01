@@ -1,8 +1,16 @@
 #' HTML response code handler
 #'
-#' @return Return defined message for each html response code
+#' @param code numeric response code from GET request
+#'
+#' @return HTML response code message for relevant code
 #'
 #'
+#' @examples
+#' \dontrun{
+#' response_code_message(200)
+#' }
+#'
+
 
 response_code_message <- function(code){
 
