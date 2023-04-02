@@ -18,7 +18,7 @@ datetime format for use within R
 Convert datetime format from OpenNEM into R friendly datetime format
 }
 \examples{
-convert_on_datetime("2023-03-01T10:00:00+10:00",
-                    return = "aware")
-
+\dontrun{
+convert_on_datetime(dt = "2023-03-01Z 12:00:00T")
+}
 }

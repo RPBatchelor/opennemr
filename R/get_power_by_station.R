@@ -93,6 +93,9 @@ get_power_by_station <- function(network_code,
 
   }
 
+  facility_data_full <- facility_data_full |>
+    dplyr::rename("value" = "data")
+
   return(facility_data_full)
 
 }

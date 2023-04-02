@@ -15,11 +15,10 @@ get_interval_list <- function(){
 
   if(response$status_code == 200){
 
-    # response_200()
-
     response_content <- httr::content(response,
                                       as = "text",
                                       encoding = "UTF-8")
+
     intervals <- jsonlite::fromJSON(response_content) |>
       tidyr::unnest(cols = c())
 
@@ -38,13 +37,11 @@ get_interval_list <- function(){
     intervals <- intervals |>
       dplyr::bind_cols("intervals_seq" = intervals_seq)
 
+    return(intervals)
 
   } else {
 
-    response_code_message(response$status_code)
+    stop(response_code_message(response$status_code))
 
   }
-
-  return(intervals)
-
 }

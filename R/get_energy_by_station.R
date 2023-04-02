@@ -8,11 +8,14 @@
 #' @return dataframe of energy data (MWh) by station
 #' @export
 #'
-#' @examples
+#'
+#'@examples
+#'
 #' df <- get_energy_by_station(network_code = "NEM",
 #'                             station_code = "LOYYANGA",
 #'                             interval = "1d",
 #'                             period = "7d")
+#'
 
 
 get_energy_by_station <- function(network_code,
@@ -102,14 +105,18 @@ get_energy_by_station <- function(network_code,
         dplyr::mutate(data_interval = interval)
 
     }
+
+    # Clean final dataset before returning
+    facility_data_full <- facility_data_full |>
+      dplyr::rename("value" = "data")
+    return(facility_data_full)
+
   } else {
 
     response_code_message(response$status_code)
+    stop()
 
   }
-
-  return(facility_data_full)
-
 
 }
 
