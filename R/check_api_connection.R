@@ -1,8 +1,12 @@
-#' Check API version
+#' Check API version number
 #'
-#' Queries the main OpenNEM page to get version number
+#' @param suppress_messages suppress chromote messages
 #'
-#' @noRd
+#' @return [string] API version number
+#' @export
+#'
+#' @examples
+#' check_api_version()
 #'
 
 check_api_version <- function(suppress_messages = TRUE){
@@ -14,6 +18,7 @@ check_api_version <- function(suppress_messages = TRUE){
 
   url <- "https://api.opennem.org.au/docs"
   b$Page$navigate(url)
+  Sys.sleep(0.5)
 
   # Extract the API version
   page_data <- b$Runtime$evaluate('document.querySelector("h1").innerText')
@@ -28,11 +33,15 @@ check_api_version <- function(suppress_messages = TRUE){
 
 
 
-
-#' Check status of the OpenNEM API
+#' Check OpenNEM API status
 #'
+#' @param suppress_messages suppress chromote messages
 #'
-#' @noRd
+#' @return status of the OpenNEM API
+#' @export
+#'
+#' @examples
+#' check_api_status()
 #'
 
 check_api_status <- function(suppress_messages = TRUE){
@@ -44,6 +53,7 @@ check_api_status <- function(suppress_messages = TRUE){
 
   url <- "https://status.opennem.org.au/"
   b$Page$navigate(url)
+  Sys.sleep(0.5)
 
   # Extract the overall status and status of the OpenNEM API
   page_data <- b$Runtime$evaluate('document.querySelector(".status").innerText')
