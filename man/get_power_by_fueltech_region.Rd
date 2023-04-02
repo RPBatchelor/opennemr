@@ -20,7 +20,9 @@ Dataframe of power/price data by fueltech
 Get power data by fueltech and network region
 }
 \examples{
+\donttest{
 df <- get_power_by_fueltech_region(network_code = "NEM",
                                   network_region_code = "VIC1",
                                   month = "2023-02-01")
+}
 }
