@@ -22,6 +22,8 @@ check_api_version <- function(suppress_messages = TRUE){
 
   b$close()
 
+  message(glue::glue("API version: {api_version}"))
+
   return(api_version)
 
 }
