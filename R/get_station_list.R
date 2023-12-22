@@ -19,22 +19,55 @@ get_station_list <- function(){
     response_content <- httr::content(response,
                                       as = "text",
                                       encoding = "UTF-8")
-    stations <- jsonlite::fromJSON(response_content)
-    cols_to_keep <- c(1:5, 7:9, 11:12, 14, 17:21, 23:30, 34, 37)
-    stations <- tibble::tibble(stations$data) |>
+    stations_raw <- jsonlite::fromJSON(response_content)
+    cols_to_keep <- c("station_id",
+                      "station_code",
+                      "station_name",
+                      "location_id",
+                      "facilities_id",
+                      "network_code",
+                      "fueltech_code",
+                      "renewable",
+                      "status_code",
+                      "facilities_code",
+                      "facilities_dispatch_type",
+                      "facilities_active",
+                      "facilities_capacity_registered",
+                      "facilities_unit_number",
+                      "facilities_network_region",
+                      "facilities_unit_number",
+                      "facilities_unit_capacity",
+                      "facilities_emissions_factor_co2",
+                      "facilities_registered",
+                      "description")
+
+
+    stations <- tibble::tibble(stations_raw$data) |>
       tidyr::unnest_wider(facilities, names_sep = "_") |>
-      tidyr::unnest() |>
+      tidyr::unnest(cols = c(facilities_id,
+                             facilities_network,
+                             facilities_fueltech,
+                             facilities_status,
+                             facilities_station_id,
+                             facilities_code,
+                             facilities_dispatch_type,
+                             facilities_active,
+                             facilities_capacity_registered,
+                             facilities_network_region,
+                             facilities_unit_number,
+                             facilities_unit_capacity,
+                             facilities_emissions_factor_co2,
+                             facilities_approved),
+                    names_repair = "universal") |>
       janitor::clean_names() |>
-      dplyr::select(dplyr::all_of(cols_to_keep)) |>
       dplyr::rename("station_id" = "id",
-             "station_code" = "code",
-             "station_name" = "name",
-             "network_code" = "code1",
-             "network_label" = "label",
-             "timezone_code" = "timezone_database",
-             "fueltech_code" = "code2",
-             "fueltech_label" = "label1",
-             "status_code" = "code3")
+                    "station_code" = "code_2",
+                    "station_name" = "name",
+                    "network_code" = "code_6",
+                    "fueltech_code" = "code_7",
+                    "status_code" = "code_10") |>
+      dplyr::select(dplyr::all_of(cols_to_keep))
+
 
   } else {
 
@@ -45,3 +78,21 @@ get_station_list <- function(){
   return(stations)
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
