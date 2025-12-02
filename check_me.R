@@ -9,7 +9,7 @@ library(httr2)
 library(jsonlite)
 
 # Recommended: keep your API key out of code (e.g., set in .Renviron as OPEN_ELECTRICITY_API_KEY=...)
-api_key <- "oe_3ZGsMj1Agai1qk3VoMPo1R44"
+api_key <- ""
 
 if (nzchar(api_key) == FALSE) stop("API key not found. Set OPEN_ELECTRICITY_API_KEY in your environment.")
 
