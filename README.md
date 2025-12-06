@@ -4,25 +4,34 @@
 # opennemr
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 ## Overview
 
-The goal of {opennemr} is to provide simple access to the OpenNEM API
-via R.
+The goal of {opennemr} is to provide simple access to the Open
+Electricity (formerly OpenNEM) API via R.
 
-The [OpenNEM project](https://opennem.org.au) aims to make Australian
-energy network data more accessible to a wider audience through a
-website portal and data access API’s and tools.
+The [OpenElectricity project](https://openelectricity.org.au/) aims to
+make Australian energy network data more accessible to a wider audience
+through a website portal and data access API’s and tools.
 
-Through the webport and API, OpenNEM privides access to: \* National
-Electricity Market (NEM) data \* Wholesale Electricity Market (WEM) data
-\* Australian PV Institute (APVI) data
+Through the webportal and API, OpenElectricity provides access to: \*
+National Electricity Market (NEM) data \* Wholesale Electricity Market
+(WEM) data \* Australian PV Institute (APVI) data
 
 {opennemr} provides a simple interface for R to access the public API
-provided to OpenNEM. Each of the endpoints documented in the [API
-documentation](https://api.opennem.org.au/docs) have been implemented in
-opennemr.
+provided to OpenElectricity. Each of the endpoints documented in the
+[API documentation](https://api.opennem.org.au/docs) have been
+implemented in {opennemr}.
+
+The {opennemr} package is current as of OpenElectricity API v4.
+
+## API key
+
+To use {opennemr} you will need an API key from OpenElectricity. You can
+request access from the [OpenElectricity developer
+platform](https://platform.openelectricity.org.au)
 
 ## Installation
 
@@ -39,59 +48,44 @@ devtools::install_github("RPBatchelor/opennemr")
 
 ## Using {opennemr}
 
-This package has been built from the public OpenNEM API version 3.14.0,
-and provides access to two types of data:
-
-- **Static lists** such as:
-  - list of stations and facilities
-  - list of networks and network regions
-  - list of fueltechs
-  - time periods and intervals
-- **Statistics** such as:
-  - Facility power and energy data
-  - Interconnector flows
-
-### Static lists
-
-A key function of opennemr is to download static lists from {opennemr}.
-This is a useful first step to build the necessary inputs for later
-downloading time series statistc data.
-
 First we’ll load the {opennemr} package and the {tidyverse}
 
 ``` r
-library(opennemr)
-#> 
-#> 
+#library(opennemr)
 library(tidyverse)
-#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2
-#> ──
-#> ✔ ggplot2 3.4.1     ✔ purrr   1.0.1
-#> ✔ tibble  3.1.8     ✔ dplyr   1.1.0
-#> ✔ tidyr   1.3.0     ✔ stringr 1.5.0
-#> ✔ readr   2.1.4     ✔ forcats 1.0.0
+#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+#> ✔ dplyr     1.1.4     ✔ readr     2.1.6
+#> ✔ forcats   1.0.1     ✔ stringr   1.6.0
+#> ✔ ggplot2   4.0.1     ✔ tibble    3.3.0
+#> ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+#> ✔ purrr     1.2.0     
 #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 #> ✖ dplyr::filter() masks stats::filter()
 #> ✖ dplyr::lag()    masks stats::lag()
+#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 ```
 
-Now we’ll create some dataframes of the relevant static list data from
-the OpenNEM database
+It is recommended that you save your API key in your system environment,
+and don’t push this to public repositories such as GitHub.
 
 ``` r
-networks <- get_network_list()
-stations <- get_station_list()
-#> Warning: `cols` is now required when using `unnest()`.
-#> ℹ Please use `cols = c(facilities_id, facilities_network, facilities_fueltech,
-#>   facilities_status, facilities_station_id, facilities_code,
-#>   facilities_dispatch_type, facilities_active, facilities_capacity_registered,
-#>   facilities_network_region, facilities_unit_number, facilities_unit_capacity,
-#>   facilities_emissions_factor_co2, facilities_approved, facilities_registered,
-#>   facilities_approved_at, facilities_approved_by)`.
-fueltechs <- get_fueltech_list()
+# Run this code in your R console
+usethis::edit_r_environ()
+#> ☐ Edit 'C:/Users/rpbat/OneDrive/8. Documents/.Renviron'.
+#> ☐ Restart R for changes to take effect.
+
+# Then manually add this line and save:
+# OPEN_ELECTRICITY_API_KEY = <your_actual_api_key_here>
 ```
 
-### Time series statistics
+Once you have done this, restart your R session and then run the below
+function from the {opennemr} pacakge
+
+``` r
+# oe_check_user()
+```
+
+### Time series data
 
 Now we’ll look to download some actual power data for a given station.
 From the *stations* list we know the station code for Loy Yang A is
@@ -99,49 +93,31 @@ From the *stations* list we know the station code for Loy Yang A is
 minute intervals for a period of 7 days using the below:
 
 ``` r
-lya_power <- get_power_by_station(network_code = "NEM",
-                                  station_code = "LOYYANGA",
-                                  interval = "30m", 
-                                  period = "7d")
-#> Warning: `cols` is now required when using `unnest()`.
-#> ℹ Please use `cols = c(facilities_id, facilities_network, facilities_fueltech,
-#>   facilities_status, facilities_station_id, facilities_code,
-#>   facilities_dispatch_type, facilities_active, facilities_capacity_registered,
-#>   facilities_network_region, facilities_unit_number, facilities_unit_capacity,
-#>   facilities_emissions_factor_co2, facilities_approved, facilities_registered,
-#>   facilities_approved_at, facilities_approved_by)`.
-#> Warning: `cols` is now required when using `unnest()`.
-#> ℹ Please use `cols = c(history)`.
+#lya_power <- get_power_by_station(network_code = "NEM",
+                                  # station_code = "LOYYANGA",
+                                  # interval = "30m", 
+                                  # period = "7d")
 ```
 
 This is what the data looks like:
 
 ``` r
-str(lya_power)
-#> tibble [1,011 × 6] (S3: tbl_df/tbl/data.frame)
-#>  $ code        : chr [1:1011] "LYA2" "LYA2" "LYA2" "LYA2" ...
-#>  $ network     : chr [1:1011] "nem" "nem" "nem" "nem" ...
-#>  $ data_type   : chr [1:1011] "power" "power" "power" "power" ...
-#>  $ units       : chr [1:1011] "MW" "MW" "MW" "MW" ...
-#>  $ value       : num [1:1011] 475 458 466 504 525 ...
-#>  $ period_start: POSIXct[1:1011], format: "2023-03-25 18:30:00" "2023-03-25 19:00:00" ...
+#str(lya_power)
 ```
 
 It’s now very simple to chart the power output of each generator at Loy
 Yan A over time
 
 ``` r
-(p <- lya_power |> 
-    ggplot(aes(x = period_start, y = value)) +
-    geom_line() +
-    facet_wrap(~code) + 
-    theme_grey() +
-    labs(x = "Period start",
-         y = "Power (MW)")
-)
+# (p <- lya_power |> 
+#     ggplot(aes(x = period_start, y = value)) +
+#     geom_line() +
+#     facet_wrap(~code) + 
+#     theme_grey() +
+#     labs(x = "Period start",
+#          y = "Power (MW)")
+# )
 ```
-
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 The period of time over which you can download data for a given station
 can be found by running {get_period_list()}. Similarly, the intervals
@@ -159,44 +135,42 @@ for the month of March 2023.
 
 ``` r
 
-vic_power_fueltech <- get_power_by_fueltech_region(network_code = "NEM",
-                                                   network_region_code = "VIC1",
-                                                   month = "2023-03-01")
+# vic_power_fueltech <- get_power_by_fueltech_region(network_code = "NEM",
+#                                                    network_region_code = "VIC1",
+#                                                    month = "2023-03-01")
 ```
 
 **Note** The way the API works for this particular endpoint is that both
 power and price data are returned
 
 ``` r
-unique(vic_power_fueltech$type)
-#> [1] "power" "price"
+# unique(vic_power_fueltech$type)
 ```
 
 Therefore,, filter for either of these variables once you’ve got the
 data. Below charts power by fueltech for a 1 week period
 
 ``` r
-(p <- vic_power_fueltech |> 
-    filter(period_start >= "2023-03-24",
-           period_start < "2023-03-31",
-           type == "power") |> 
-    ggplot() +
-    geom_area(aes(x = period_start,
-                  y = value, 
-                  fill = fueltech),
-              show.legend = TRUE) +
-    theme_grey() +
-    labs(x = "Period start",
-         y = "Power (MW)",
-         fill = "Fuel technology")
-)
+# (p <- vic_power_fueltech |> 
+#     filter(period_start >= "2023-03-24",
+#            period_start < "2023-03-31",
+#            type == "power") |> 
+#     ggplot() +
+#     geom_area(aes(x = period_start,
+#                   y = value, 
+#                   fill = fueltech),
+#               show.legend = TRUE) +
+#     theme_grey() +
+#     labs(x = "Period start",
+#          y = "Power (MW)",
+#          fill = "Fuel technology")
+# )
 ```
-
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
 ## Disclaimer
 
-The {opennemr} pacakge is not associated with the OpenNEM team, and has
-been developed independently to facilitate a straightforward access to
-the API backend in R. All data is provided subject to any restrictions
-and licensing arrangements noted on the OpenNEM website.
+The {opennemr} pacakge is not associated with the OpenElectricity team,
+and has been developed independently to facilitate a straightforward
+access to the API backend in R. All data is provided subject to any
+restrictions and licensing arrangements noted on the OpenElectricity
+website.
