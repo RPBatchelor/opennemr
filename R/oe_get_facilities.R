@@ -168,6 +168,8 @@ oe_get_facilities <- function(facility_code = NULL,
   # Parse response
   content <- httr::content(response, as = "parsed", encoding = "UTF-8")
 
+  print(glue::glue("Fetched {content$total_records} records."))
+
   # Check if request was successful
   if (!isTRUE(content$success)) {
     stop(paste("API error:", content$error))

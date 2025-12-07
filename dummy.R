@@ -1,6 +1,7 @@
 
 
-# usethis::edit_r_environ()
+
+
 
 devtools::load_all()
 
@@ -42,7 +43,6 @@ filtered <- oe_get_facilities(
   network_id = "NEM",
   fueltech_id = "solar_utility"
 )
-
 
 
 

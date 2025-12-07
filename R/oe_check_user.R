@@ -1,6 +1,33 @@
-
-
-
+#' Check OpenElectricity API user status
+#'
+#' @description
+#' Verify your OpenElectricity API credentials and check your account status.
+#' This function queries the API to confirm authentication is working and
+#' displays your user information including account plan and remaining API calls.
+#'
+#' @details
+#' This is useful for:
+#' - Verifying your API key is correctly configured
+#' - Checking your account plan type
+#' - Monitoring remaining API call quota
+#'
+#' The function prints three pieces of information:
+#' - Valid user: Your full name from the API account
+#' - User plan: Your subscription plan level
+#' - API calls remaining: Number of API calls left in your quota
+#'
+#' @return Invisibly returns a list containing the full API response data.
+#'
+#' @examples
+#' \dontrun{
+#' # Check your API user status
+#' oe_check_user()
+#'
+#' # Capture the response data
+#' user_info <- oe_check_user()
+#' }
+#'
+#' @export
 oe_check_user <-  function(){
 
   api_key <- oe_get_api()
@@ -29,5 +56,6 @@ oe_check_user <-  function(){
   print(glue::glue("User plan: {content$data$plan} \n"))
   print(glue::glue("API calls remaining: {content$data$meta$remaining}  \n"))
 
+  invisible(content)
 
 }
