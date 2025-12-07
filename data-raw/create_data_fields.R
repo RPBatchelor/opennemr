@@ -95,9 +95,21 @@ oe_intervals <- tibble::tribble(
   "7d",       "7 days",
   "1M",       "1 month",
   "3M",       "3 months",
-  "season", "Season",
-  "1y", "1 Year",
-  "fy", "Financial year"
+  "season",   "Season",
+  "1y",       "1 Year",
+  "fy",       "Financial year"
+)
+
+oe_metrics <- tibble::tribble(
+  ~metric, ~metric_attribute, ~metric_unit,
+  "power", "Instantaneous power output/consumption (MW)", "MW",
+  "energy", "Energy generated/consumed over time (MWh)", "MWh",
+  "price", "Price per unit of energy ($/MWh)", "$/MWh",
+  "market_value", "Total market value ($)", "$",
+  "demand", "Demand for power (MW)", "MW",
+  "demand_energy", "Demand for energy (MWh)", "MWh",
+  "emissions", "CO2 equivalent emissions (tonnes)", "tCO2-e",
+  "renewable_proportion", "Percentage of renewable energy (%)", "%"
 )
 
 
@@ -109,6 +121,7 @@ usethis::use_data(oe_network_interconnectors, overwrite = TRUE)
 usethis::use_data(oe_fueltech_groups, overwrite = TRUE)
 usethis::use_data(oe_fueltechs, overwrite = TRUE)
 usethis::use_data(oe_intervals, overwrite = TRUE)
+usethis::use_data(oe_metrics, overwrite = TRUE)
 
 
 

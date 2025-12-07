@@ -19,5 +19,6 @@ usethis::use_data(oe_network_list,
                   oe_fueltech_groups,
                   oe_fueltechs,
                   oe_intervals,
+                  oe_metrics,
                   internal = TRUE, overwrite = TRUE)
 

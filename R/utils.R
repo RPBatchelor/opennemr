@@ -23,10 +23,18 @@ format_datetime <- function(dt) {
     # Remove timezone - API wants timezone-naive format
     return(format(dt, "%Y-%m-%dT%H:%M:%S"))
   }
-  # If it's a character, remove any 'Z' or timezone info
+  # If it's a character, parse and format it
   dt_char <- as.character(dt)
+
+  # Remove any 'Z' or timezone info
   dt_char <- gsub("Z$", "", dt_char)  # Remove trailing Z
   dt_char <- gsub("[+-]\\d{2}:\\d{2}$", "", dt_char)  # Remove timezone offset
+
+  # If it's just a date (YYYY-MM-DD), add time component
+  if (grepl("^\\d{4}-\\d{2}-\\d{2}$", dt_char)) {
+    dt_char <- paste0(dt_char, "T00:00:00")
+  }
+
   return(dt_char)
 }
 

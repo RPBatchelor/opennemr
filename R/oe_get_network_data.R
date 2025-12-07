@@ -28,6 +28,82 @@ oe_get_network_data <- function(network_code,
   }
 
 
+  # Validate parameter values against reference data
+
+  # Validate network_code
+  valid_networks <- oe_network_list$network_name
+  if (!network_code %in% valid_networks) {
+    stop(sprintf(
+      "Invalid network_code '%s'. Must be one of: %s",
+      network_code,
+      paste(valid_networks, collapse = ", ")
+    ))
+  }
+
+  # TODO: Add support for multiple metrics
+  # Currently the API v4 returns 500 errors when multiple metrics are requested
+  # For now, only allow single metric queries
+  if (length(metrics) > 1) {
+    stop("Currently only single metric queries are supported. Please provide one metric at a time.")
+  }
+
+  # Validate metrics
+  valid_metrics <- oe_metrics$metric
+  if (!metrics %in% valid_metrics) {
+    stop(sprintf(
+      "Invalid metric '%s'. Valid metrics are: %s",
+      metrics,
+      paste(valid_metrics, collapse = ", ")
+    ))
+  }
+
+  # Validate interval
+  valid_intervals <- oe_intervals$interval
+  if (!interval %in% valid_intervals) {
+    stop(sprintf(
+      "Invalid interval '%s'. Must be one of: %s",
+      interval,
+      paste(valid_intervals, collapse = ", ")
+    ))
+  }
+
+  # Validate network_region if provided
+  if (!is.null(network_region)) {
+    valid_regions <- oe_network_regions$region
+    if (!network_region %in% valid_regions) {
+      stop(sprintf(
+        "Invalid network_region '%s'. Must be one of: %s",
+        network_region,
+        paste(valid_regions, collapse = ", ")
+      ))
+    }
+  }
+
+  # Validate fueltech if provided
+  if (!is.null(fueltech)) {
+    valid_fueltechs <- oe_fueltechs$fueltech
+    if (!fueltech %in% valid_fueltechs) {
+      stop(sprintf(
+        "Invalid fueltech '%s'. Must be one of: %s",
+        fueltech,
+        paste(valid_fueltechs, collapse = ", ")
+      ))
+    }
+  }
+
+  # Validate fueltech_group if provided
+  if (!is.null(fueltech_group)) {
+    valid_fueltech_groups <- oe_fueltech_groups$fueltech_group
+    if (!fueltech_group %in% valid_fueltech_groups) {
+      stop(sprintf(
+        "Invalid fueltech_group '%s'. Must be one of: %s",
+        fueltech_group,
+        paste(valid_fueltech_groups, collapse = ", ")
+      ))
+    }
+  }
+
+
   # Build the required endpoint URL
   endpoint <- paste0(
     oe_endpoints$oe_api_base_url,
@@ -39,15 +115,10 @@ oe_get_network_data <- function(network_code,
   # Build query parameters
   query_params <- list(
     interval = interval,
+    metrics = metrics,
     primary_grouping = primary_grouping,
     with_clerk = tolower(as.character(with_clerk))
   )
-
-  # Add each metric as a separate parameter
-  for (metric in metrics) {
-    query_params <- c(query_params, list(metrics = metric))
-  }
-
 
   # Add optional parameters
   if (!is.null(date_start)) {
@@ -73,8 +144,6 @@ oe_get_network_data <- function(network_code,
   if (!is.null(secondary_grouping)) {
     query_params$secondary_grouping <- secondary_grouping
   }
-
-
 
   # Make API request
   response <- httr::GET(
