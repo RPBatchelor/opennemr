@@ -2,3 +2,6 @@
 
 export(oe_check_user)
 export(oe_get_facilities)
+export(oe_get_facility_data)
+export(oe_get_network_data)
+export(oe_get_network_market_data)

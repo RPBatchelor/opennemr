@@ -4,15 +4,41 @@
 \alias{parse_network_data}
 \title{Helper function to parse API response data into a data frame}
 \usage{
-parse_network_data(data)
+parse_network_data(
+  data,
+  primary_grouping_name = NULL,
+  secondary_grouping_name = NULL
+)
 }
 \arguments{
 \item{data}{List from API response}
+
+\item{primary_grouping_name}{Character. Name of the primary grouping parameter (e.g., "network", "network_region").
+If provided, creates a column with this name. Default: NULL.}
+
+\item{secondary_grouping_name}{Character. Name of the secondary grouping parameter (e.g., "fueltech", "fueltech_group").
+If provided, creates a column with this name. Default: NULL.}
 }
 \value{
-Data frame
+Data frame with columns:
+\describe{
+  \item{datetime}{POSIXct timestamp with network timezone}
+  \item{value}{Numeric value for the metric}
+  \item{[grouping_name]}{Dynamically named column(s) based on grouping parameters used}
+  \item{network_code}{Network identifier}
+  \item{metric}{Metric type}
+  \item{unit}{Unit of measurement}
+  \item{interval}{Time interval}
+}
 }
 \description{
-Helper function to parse API response data into a data frame
+Parses time series data from the OpenElectricity API, converting datetime strings
+to POSIXct and extracting grouping information from series names.
+}
+\details{
+The function extracts grouping information from the series_name field using regex:
+- Format: "metric_primary|secondary" → Creates columns with actual grouping names
+- Format: "metric_primary" → Creates one column with primary grouping name
+- Format: "metric" → No grouping columns created
 }
 \keyword{internal}

@@ -1,8 +1,5 @@
 #' @noRd
 dummy <- function() {
-  assertthat::assert_that
-  janitor::clean_names
-  stringr::str_extract
   tibble::tibble
 }
 

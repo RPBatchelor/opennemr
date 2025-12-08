@@ -1,26 +1,23 @@
-#' Get network time series data from OpenElectricity API
+#' Get network market data from OpenElectricity API
 #'
 #' @description
-#' Retrieve time series electricity data for a specific network from the
-#' OpenElectricity API v4. This function provides access to metrics like power,
-#' energy, price, emissions, and more, aggregated by network, region, or fuel technology.
+#' Retrieve market-related time series data for electricity networks from the
+#' OpenElectricity API v4. This endpoint provides access to market metrics like
+#' price, demand, and market value aggregated at the network or regional level.
 #'
 #' @param network_code Character. Network identifier. Valid values: "NEM", "WEM", "AEMO_ROOFTOP", "APVI". Required.
-#' @param metrics Character. Metric to retrieve. Currently only single metrics are supported. Valid values: "power", "energy", "price", "market_value", "demand", "demand_energy", "emissions", "renewable_proportion". See `oe_metrics` for details. Required.
+#' @param metrics Character vector. Metrics to retrieve. Valid values: "power", "energy", "price", "market_value", "demand", "demand_energy", "emissions", "renewable_proportion". See `oe_metrics` for details. Required.
 #' @param interval Character. Time interval for data aggregation. Valid values: "5m", "1h", "1d", "7d", "1M", "3M", "season", "1y", "fy". Default: "5m".
 #' @param date_start Character or POSIXct. Start date/time for data range. Format: "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS". Default: NULL (API default).
 #' @param date_end Character or POSIXct. End date/time for data range. Format: "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS". Default: NULL (API default).
 #' @param network_region Character. Filter by network region. Valid values: "NSW1", "QLD1", "SA1", "TAS1", "VIC1", "SNOWY1", "WEM". Default: NULL (all regions).
-#' @param fueltech Character. Filter by fuel technology. See `oe_fueltechs` for valid values. Default: NULL (all fueltechs).
-#' @param fueltech_group Character. Filter by fuel technology group. See `oe_fueltech_groups` for valid values. Default: NULL (all groups).
-#' @param primary_grouping Character. Primary grouping for data aggregation. Default: "network".
-#' @param secondary_grouping Character. Secondary grouping for data aggregation. Default: NULL.
+#' @param primary_grouping Character. Primary grouping for data aggregation. Valid values: "network", "network_region". Default: "network".
 #' @param with_clerk Logical. Include clerk data in response. Default: TRUE.
 #' @param api_key Character. OpenElectricity API key. If NULL, uses OPEN_ELECTRICITY_API_KEY environment variable. Default: NULL.
 #'
 #' @return Data frame with columns:
 #' \describe{
-#'   \item{datetime}{Timestamp for the data point}
+#'   \item{datetime}{POSIXct timestamp for the data point with network timezone}
 #'   \item{value}{Numeric value for the metric}
 #'   \item{series_name}{Name of the data series}
 #'   \item{network_code}{Network identifier}
@@ -30,54 +27,60 @@
 #' }
 #'
 #' @details
-#' **Current Limitation:** This function currently only supports single metric queries.
-#' The API v4 returns 500 errors when multiple metrics are requested simultaneously.
-#' This limitation is documented for future enhancement.
+#' This function provides access to market-related data including prices, demand,
+#' and market values. Unlike `oe_get_network_data()`, this endpoint can handle
+#' multiple metrics in a single request.
+#'
+#' Common use cases:
+#' - Price analysis and forecasting
+#' - Demand patterns and trends
+#' - Market value calculations
+#' - Regional market comparisons
 #'
 #' @examples
 #' \dontrun{
-#' # Get hourly energy data for NEM
-#' nem_energy <- oe_get_network_data(
+#' # Get price data for NEM
+#' nem_prices <- oe_get_network_market_data(
 #'   network_code = "NEM",
-#'   metrics = "energy",
+#'   metrics = "price",
 #'   interval = "1h",
 #'   date_start = "2024-12-01",
 #'   date_end = "2024-12-02"
 #' )
 #'
-#' # Get power data for Victoria only
-#' vic_power <- oe_get_network_data(
+#' # Get multiple market metrics
+#' market_data <- oe_get_network_market_data(
 #'   network_code = "NEM",
-#'   metrics = "power",
-#'   interval = "5m",
+#'   metrics = c("price", "demand", "market_value"),
+#'   interval = "1d",
 #'   network_region = "VIC1"
 #' )
 #'
-#' # Get emissions data for coal generation
-#' coal_emissions <- oe_get_network_data(
+#' # Get demand and price for all NEM regions
+#' regional_market <- oe_get_network_market_data(
 #'   network_code = "NEM",
-#'   metrics = "emissions",
-#'   interval = "1d",
-#'   fueltech_group = "coal"
+#'   metrics = c("demand", "price"),
+#'   interval = "1h",
+#'   primary_grouping = "network_region"
 #' )
 #' }
 #'
+#' @seealso
+#' \code{\link{oe_get_network_data}} for generation/emissions data,
+#' \code{\link{oe_get_facility_data}} for facility-level data
+#'
 #' @export
-oe_get_network_data <- function(network_code,
-                                metrics,
-                                interval = "5m",
-                                date_start = NULL,
-                                date_end = NULL,
-                                network_region = NULL,
-                                fueltech = NULL,
-                                fueltech_group = NULL,
-                                primary_grouping = "network",
-                                secondary_grouping = NULL,
-                                with_clerk = TRUE,
-                                api_key = NULL
-                                ){
+oe_get_network_market_data <- function(network_code,
+                                        metrics,
+                                        interval = "5m",
+                                        date_start = NULL,
+                                        date_end = NULL,
+                                        network_region = NULL,
+                                        primary_grouping = "network",
+                                        with_clerk = TRUE,
+                                        api_key = NULL) {
 
-  # Validate required inputs and dependencies
+  # Validate required inputs
   if (missing(network_code) || is.null(network_code)) {
     stop("network_code is required")
   }
@@ -103,19 +106,13 @@ oe_get_network_data <- function(network_code,
     ))
   }
 
-  # TODO: Add support for multiple metrics
-  # Currently the API v4 returns 500 errors when multiple metrics are requested
-  # For now, only allow single metric queries
-  if (length(metrics) > 1) {
-    stop("Currently only single metric queries are supported. Please provide one metric at a time.")
-  }
-
-  # Validate metrics
+  # Validate metrics (can be multiple)
   valid_metrics <- oe_metrics$metric
-  if (!metrics %in% valid_metrics) {
+  invalid_metrics <- metrics[!metrics %in% valid_metrics]
+  if (length(invalid_metrics) > 0) {
     stop(sprintf(
-      "Invalid metric '%s'. Valid metrics are: %s",
-      metrics,
+      "Invalid metric(s): %s. Valid metrics are: %s",
+      paste(invalid_metrics, collapse = ", "),
       paste(valid_metrics, collapse = ", ")
     ))
   }
@@ -142,35 +139,21 @@ oe_get_network_data <- function(network_code,
     }
   }
 
-  # Validate fueltech if provided
-  if (!is.null(fueltech)) {
-    valid_fueltechs <- oe_fueltechs$fueltech
-    if (!fueltech %in% valid_fueltechs) {
-      stop(sprintf(
-        "Invalid fueltech '%s'. Must be one of: %s",
-        fueltech,
-        paste(valid_fueltechs, collapse = ", ")
-      ))
-    }
-  }
-
-  # Validate fueltech_group if provided
-  if (!is.null(fueltech_group)) {
-    valid_fueltech_groups <- oe_fueltech_groups$fueltech_group
-    if (!fueltech_group %in% valid_fueltech_groups) {
-      stop(sprintf(
-        "Invalid fueltech_group '%s'. Must be one of: %s",
-        fueltech_group,
-        paste(valid_fueltech_groups, collapse = ", ")
-      ))
-    }
+  # Validate primary_grouping
+  valid_groupings <- c("network", "network_region")
+  if (!primary_grouping %in% valid_groupings) {
+    stop(sprintf(
+      "Invalid primary_grouping '%s'. Must be one of: %s",
+      primary_grouping,
+      paste(valid_groupings, collapse = ", ")
+    ))
   }
 
 
   # Build the required endpoint URL
   endpoint <- paste0(
     oe_endpoints$oe_api_base_url,
-    oe_endpoints$oe_api_network_data,
+    oe_endpoints$oe_api_market_data,
     network_code
   )
 
@@ -178,12 +161,16 @@ oe_get_network_data <- function(network_code,
   # Build query parameters
   query_params <- list(
     interval = interval,
-    metrics = metrics,
     primary_grouping = primary_grouping,
     with_clerk = tolower(as.character(with_clerk))
   )
 
-  # Add optional parameters
+  # Add metrics (can be multiple)
+  for (metric in metrics) {
+    query_params <- c(query_params, list(metrics = metric))
+  }
+
+  # Add optional date parameters
   if (!is.null(date_start)) {
     query_params$date_start <- format_datetime(date_start)
   }
@@ -192,21 +179,11 @@ oe_get_network_data <- function(network_code,
     query_params$date_end <- format_datetime(date_end)
   }
 
+  # Add optional network_region
   if (!is.null(network_region)) {
     query_params$network_region <- network_region
   }
 
-  if (!is.null(fueltech)) {
-    query_params$fueltech <- fueltech
-  }
-
-  if (!is.null(fueltech_group)) {
-    query_params$fueltech_group <- fueltech_group
-  }
-
-  if (!is.null(secondary_grouping)) {
-    query_params$secondary_grouping <- secondary_grouping
-  }
 
   # Make API request
   response <- httr::GET(
@@ -237,15 +214,11 @@ oe_get_network_data <- function(network_code,
     stop(paste("API error:", content$error))
   }
 
-  # Convert to data frame, passing grouping names for dynamic column naming
+  # Convert to data frame using network data parser, passing grouping name for dynamic column naming
   df <- parse_network_data(
     content$data,
-    primary_grouping_name = primary_grouping,
-    secondary_grouping_name = secondary_grouping
+    primary_grouping_name = primary_grouping
   )
 
   return(df)
-
-
-
 }

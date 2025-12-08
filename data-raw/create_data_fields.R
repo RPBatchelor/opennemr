@@ -112,6 +112,16 @@ oe_metrics <- tibble::tribble(
   "renewable_proportion", "Percentage of renewable energy (%)", "%"
 )
 
+# API endpoints (internal data)
+oe_endpoints <- list(
+  oe_api_base_url = "https://api.openelectricity.org.au",
+  oe_api_network_data = "/v4/data/network/",
+  oe_api_facility_data = "/v4/data/facilities/",
+  oe_api_market_data = "/v4/market/network/",
+  oe_api_facilities = "/v4/facilities/",
+  oe_api_user_me = "/v4/me"
+)
+
 
 # Export
 
@@ -122,6 +132,9 @@ usethis::use_data(oe_fueltech_groups, overwrite = TRUE)
 usethis::use_data(oe_fueltechs, overwrite = TRUE)
 usethis::use_data(oe_intervals, overwrite = TRUE)
 usethis::use_data(oe_metrics, overwrite = TRUE)
+
+# Export internal data (not visible to users, only to package functions)
+usethis::use_data(oe_endpoints, internal = TRUE, overwrite = TRUE)
 
 
 
