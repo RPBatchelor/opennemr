@@ -26,11 +26,11 @@ The function parses ISO 8601 datetime strings with timezone offsets and converts
 them to POSIXct objects. If a network_code is provided, the times are converted
 to that network's timezone.
 
-Network timezones:
-- NEM: Australia/Sydney (UTC+10/+11 with DST)
+Network timezones (fixed offsets per API documentation):
+- NEM: Etc/GMT-10 (UTC+10, fixed — NEM market time never adjusts for DST)
 - WEM: Australia/Perth (UTC+8, no DST)
-- AEMO_ROOFTOP: Australia/Sydney
-- APVI: Australia/Sydney
+- AEMO_ROOFTOP: Etc/GMT-10 (UTC+10, fixed)
+- APVI: Etc/GMT-10 (UTC+10, fixed)
 }
 \examples{
 \dontrun{

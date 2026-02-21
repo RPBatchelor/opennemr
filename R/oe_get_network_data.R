@@ -5,7 +5,8 @@
 #' OpenElectricity API v4. This function provides access to metrics like power,
 #' energy, price, emissions, and more, aggregated by network, region, or fuel technology.
 #'
-#' @param network_code Character. Network identifier. Valid values: "NEM", "WEM", "AEMO_ROOFTOP", "APVI". Required.
+#' @param network_code Character. Network identifier. Valid values: "NEM", "WEM". Required.
+#'   Note: "AEMO_ROOFTOP" and "APVI" are not supported by this endpoint (API returns 400).
 #' @param metrics Character. Metric to retrieve. Currently only single metrics are supported. Valid values: "power", "energy", "price", "market_value", "demand", "demand_energy", "emissions", "renewable_proportion". See `oe_metrics` for details. Required.
 #' @param interval Character. Time interval for data aggregation. Valid values: "5m", "1h", "1d", "7d", "1M", "3M", "season", "1y", "fy". Default: "5m".
 #' @param date_start Character or POSIXct. Start date/time for data range. Format: "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS". Default: NULL (API default).
@@ -93,14 +94,10 @@ oe_get_network_data <- function(network_code,
 
   # Validate parameter values against reference data
 
-  # Validate network_code
-  valid_networks <- oe_network_list$network_name
+  # Validate network_code — only NEM and WEM are supported by this endpoint
+  valid_networks <- c("NEM", "WEM")
   if (!network_code %in% valid_networks) {
-    stop(sprintf(
-      "Invalid network_code '%s'. Must be one of: %s",
-      network_code,
-      paste(valid_networks, collapse = ", ")
-    ))
+    stop(glue::glue("Invalid network_code '{network_code}'. Must be one of: {paste(valid_networks, collapse = ', ')}. Note: AEMO_ROOFTOP and APVI are not supported by this endpoint."))
   }
 
   # TODO: Add support for multiple metrics
@@ -113,32 +110,20 @@ oe_get_network_data <- function(network_code,
   # Validate metrics
   valid_metrics <- oe_metrics$metric
   if (!metrics %in% valid_metrics) {
-    stop(sprintf(
-      "Invalid metric '%s'. Valid metrics are: %s",
-      metrics,
-      paste(valid_metrics, collapse = ", ")
-    ))
+    stop(glue::glue("Invalid metric '{metrics}'. Valid metrics are: {paste(valid_metrics, collapse = ', ')}"))
   }
 
   # Validate interval
   valid_intervals <- oe_intervals$interval
   if (!interval %in% valid_intervals) {
-    stop(sprintf(
-      "Invalid interval '%s'. Must be one of: %s",
-      interval,
-      paste(valid_intervals, collapse = ", ")
-    ))
+    stop(glue::glue("Invalid interval '{interval}'. Must be one of: {paste(valid_intervals, collapse = ', ')}"))
   }
 
   # Validate network_region if provided
   if (!is.null(network_region)) {
     valid_regions <- oe_network_regions$region
     if (!network_region %in% valid_regions) {
-      stop(sprintf(
-        "Invalid network_region '%s'. Must be one of: %s",
-        network_region,
-        paste(valid_regions, collapse = ", ")
-      ))
+      stop(glue::glue("Invalid network_region '{network_region}'. Must be one of: {paste(valid_regions, collapse = ', ')}"))
     }
   }
 
@@ -146,11 +131,7 @@ oe_get_network_data <- function(network_code,
   if (!is.null(fueltech)) {
     valid_fueltechs <- oe_fueltechs$fueltech
     if (!fueltech %in% valid_fueltechs) {
-      stop(sprintf(
-        "Invalid fueltech '%s'. Must be one of: %s",
-        fueltech,
-        paste(valid_fueltechs, collapse = ", ")
-      ))
+      stop(glue::glue("Invalid fueltech '{fueltech}'. Must be one of: {paste(valid_fueltechs, collapse = ', ')}"))
     }
   }
 
@@ -158,11 +139,45 @@ oe_get_network_data <- function(network_code,
   if (!is.null(fueltech_group)) {
     valid_fueltech_groups <- oe_fueltech_groups$fueltech_group
     if (!fueltech_group %in% valid_fueltech_groups) {
-      stop(sprintf(
-        "Invalid fueltech_group '%s'. Must be one of: %s",
-        fueltech_group,
-        paste(valid_fueltech_groups, collapse = ", ")
-      ))
+      stop(glue::glue("Invalid fueltech_group '{fueltech_group}'. Must be one of: {paste(valid_fueltech_groups, collapse = ', ')}"))
+    }
+  }
+
+
+  # Check date range against API limits and handle chunked requests if needed
+  if (!is.null(date_start)) {
+    limit_info <- check_date_range_limits(date_start, date_end, interval)
+    if (limit_info$exceeds) {
+      message(glue::glue("You have asked for a duration that exceeds the standard limit for the '{interval}' interval ({limit_info$max_days_desc}).
+This will require {limit_info$n_chunks} separate API calls."))
+      if (!interactive()) {
+        stop("Date range exceeds API limit. Reduce the date range or make multiple requests manually.")
+      }
+      response <- readline("Would you like to proceed? (y/n): ")
+      if (tolower(trimws(response)) != "y") {
+        message("Request cancelled.")
+        return(invisible(NULL))
+      }
+      message(glue::glue("Making {limit_info$n_chunks} API calls..."))
+      results <- lapply(seq_along(limit_info$chunks), function(i) {
+        chunk <- limit_info$chunks[[i]]
+        message(glue::glue("  Call {i} of {limit_info$n_chunks}: {chunk$start} to {chunk$end}"))
+        oe_get_network_data(
+          network_code      = network_code,
+          metrics           = metrics,
+          interval          = interval,
+          date_start        = chunk$start,
+          date_end          = chunk$end,
+          network_region    = network_region,
+          fueltech          = fueltech,
+          fueltech_group    = fueltech_group,
+          primary_grouping  = primary_grouping,
+          secondary_grouping = secondary_grouping,
+          with_clerk        = with_clerk,
+          api_key           = api_key
+        )
+      })
+      return(do.call(rbind, results))
     }
   }
 
@@ -220,13 +235,9 @@ oe_get_network_data <- function(network_code,
 
   # Check response status
   if (httr::http_error(response)) {
-    stop(
-      sprintf(
-        "API request failed [%s]: %s",
-        httr::status_code(response),
-        httr::content(response, "text", encoding = "UTF-8")
-      )
-    )
+    status_code <- httr::status_code(response)
+    error_body  <- httr::content(response, "text", encoding = "UTF-8")
+    stop(glue::glue("API request failed [{status_code}]: {error_body}"))
   }
 
   # Parse response

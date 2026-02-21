@@ -20,7 +20,8 @@ oe_get_network_data(
 )
 }
 \arguments{
-\item{network_code}{Character. Network identifier. Valid values: "NEM", "WEM", "AEMO_ROOFTOP", "APVI". Required.}
+\item{network_code}{Character. Network identifier. Valid values: "NEM", "WEM". Required.
+Note: "AEMO_ROOFTOP" and "APVI" are not supported by this endpoint (API returns 400).}
 
 \item{metrics}{Character. Metric to retrieve. Currently only single metrics are supported. Valid values: "power", "energy", "price", "market_value", "demand", "demand_energy", "emissions", "renewable_proportion". See `oe_metrics` for details. Required.}
 

@@ -41,21 +41,21 @@ test_that("convert_oe_datetime handles different timezone offsets", {
 test_that("convert_oe_datetime applies network timezone correctly", {
   dt_string <- "2024-12-04T12:00:00+10:00"
 
-  # Test with NEM (should use Australia/Sydney)
+  # NEM uses Etc/GMT-10 — fixed UTC+10, no DST (NEM market time)
   result_nem <- convert_oe_datetime(dt_string, network_code = "NEM")
-  expect_equal(attr(result_nem, "tzone"), "Australia/Sydney")
+  expect_equal(attr(result_nem, "tzone"), "Etc/GMT-10")
 
-  # Test with WEM (should use Australia/Perth)
+  # WEM uses Australia/Perth — UTC+8, no DST
   result_wem <- convert_oe_datetime(dt_string, network_code = "WEM")
   expect_equal(attr(result_wem, "tzone"), "Australia/Perth")
 
-  # Test with AEMO_ROOFTOP (should use Australia/Sydney)
+  # AEMO_ROOFTOP uses Etc/GMT-10 — fixed UTC+10, no DST
   result_aemo <- convert_oe_datetime(dt_string, network_code = "AEMO_ROOFTOP")
-  expect_equal(attr(result_aemo, "tzone"), "Australia/Sydney")
+  expect_equal(attr(result_aemo, "tzone"), "Etc/GMT-10")
 
-  # Test with APVI (should use Australia/Sydney)
+  # APVI uses Etc/GMT-10 — fixed UTC+10, no DST
   result_apvi <- convert_oe_datetime(dt_string, network_code = "APVI")
-  expect_equal(attr(result_apvi, "tzone"), "Australia/Sydney")
+  expect_equal(attr(result_apvi, "tzone"), "Etc/GMT-10")
 })
 
 test_that("convert_oe_datetime handles vectorized input", {
@@ -130,8 +130,8 @@ test_that("convert_oe_datetime handles realistic API response data", {
   expect_s3_class(result, "POSIXct")
   expect_true(all(!is.na(result)))
 
-  # Should be in Australia/Sydney timezone
-  expect_equal(attr(result, "tzone"), "Australia/Sydney")
+  # NEM uses Etc/GMT-10 (fixed UTC+10, no DST)
+  expect_equal(attr(result, "tzone"), "Etc/GMT-10")
 
   # Should be 5-minute intervals
   time_diffs <- diff(as.numeric(result))
@@ -158,9 +158,8 @@ test_that("convert_oe_datetime with NULL network_code uses UTC", {
 
 test_that("convert_oe_datetime handles different time components correctly", {
   # Test various times throughout the day
-  # Note: December in Australia is summer, so Sydney is UTC+11 (DST)
-  # The input times have +10:00 offset, so when converted to Sydney timezone
-  # they will be displayed as 1 hour ahead
+  # NEM uses Etc/GMT-10 (fixed UTC+10), so December times are not shifted by DST.
+  # A +10:00 input always displays at the same hour in Etc/GMT-10.
   times <- c(
     "2024-12-04T00:00:00+10:00",  # Midnight in +10
     "2024-12-04T06:30:15+10:00",  # Morning with seconds

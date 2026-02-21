@@ -3,6 +3,11 @@ dummy <- function() {
   tibble::tibble
 }
 
+utils::globalVariables(c(
+  "datetime", "value", "unit_code", "network_code",
+  "metric", "unit", "interval", "series_name"
+))
+
 
 #' @noRd
 repeat_df_rows <- function(df, n) {

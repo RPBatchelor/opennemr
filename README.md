@@ -71,7 +71,7 @@ and don’t push this to public repositories such as GitHub.
 ``` r
 # Run this code in your R console
 usethis::edit_r_environ()
-#> ☐ Edit 'C:/Users/rpbat/OneDrive/8. Documents/.Renviron'.
+#> ☐ Edit 'C:/Users/rpbat/Documents/.Renviron'.
 #> ☐ Restart R for changes to take effect.
 
 # Then manually add this line and save:

@@ -17,11 +17,11 @@
 #' them to POSIXct objects. If a network_code is provided, the times are converted
 #' to that network's timezone.
 #'
-#' Network timezones:
-#' - NEM: Australia/Sydney (UTC+10/+11 with DST)
+#' Network timezones (fixed offsets per API documentation):
+#' - NEM: Etc/GMT-10 (UTC+10, fixed — NEM market time never adjusts for DST)
 #' - WEM: Australia/Perth (UTC+8, no DST)
-#' - AEMO_ROOFTOP: Australia/Sydney
-#' - APVI: Australia/Sydney
+#' - AEMO_ROOFTOP: Etc/GMT-10 (UTC+10, fixed)
+#' - APVI: Etc/GMT-10 (UTC+10, fixed)
 #'
 #' @examples
 #' \dontrun{
@@ -50,12 +50,17 @@ convert_oe_datetime <- function(datetime_string, network_code = NULL) {
     return(result)
   }
 
-  # Map network codes to R timezone names
+  # Map network codes to R timezone names.
+  # NEM, AEMO_ROOFTOP, and APVI use a fixed UTC+10 offset (no DST).
+  # The NEM settles on market time which is always UTC+10, never UTC+11.
+  # "Etc/GMT-10" is the POSIX fixed-offset timezone for UTC+10 (note: POSIX
+  # sign convention is inverted, so Etc/GMT-10 = UTC+10).
+  # WEM uses Australia/Perth which is always UTC+8 with no DST.
   network_tz_map <- c(
-    "NEM" = "Australia/Sydney",
-    "WEM" = "Australia/Perth",
-    "AEMO_ROOFTOP" = "Australia/Sydney",
-    "APVI" = "Australia/Sydney"
+    "NEM"          = "Etc/GMT-10",
+    "WEM"          = "Australia/Perth",
+    "AEMO_ROOFTOP" = "Etc/GMT-10",
+    "APVI"         = "Etc/GMT-10"
   )
 
   # Parse the datetime strings with timezone offset

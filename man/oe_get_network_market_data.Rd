@@ -17,9 +17,11 @@ oe_get_network_market_data(
 )
 }
 \arguments{
-\item{network_code}{Character. Network identifier. Valid values: "NEM", "WEM", "AEMO_ROOFTOP", "APVI". Required.}
+\item{network_code}{Character. Network identifier. Valid values: "NEM", "WEM". Required.
+Note: "AEMO_ROOFTOP" and "APVI" are not supported by this endpoint (API returns 400).}
 
-\item{metrics}{Character vector. Metrics to retrieve. Valid values: "power", "energy", "price", "market_value", "demand", "demand_energy", "emissions", "renewable_proportion". See `oe_metrics` for details. Required.}
+\item{metrics}{Character vector. Metrics to retrieve. Valid values: "power", "energy", "price", "demand", "demand_energy", "emissions", "renewable_proportion". See `oe_metrics` for details. Required.
+Note: "market_value" is listed in the API docs but returns a 400 error as of API v4.4.12 and is not supported.}
 
 \item{interval}{Character. Time interval for data aggregation. Valid values: "5m", "1h", "1d", "7d", "1M", "3M", "season", "1y", "fy". Default: "5m".}
 
@@ -77,7 +79,7 @@ nem_prices <- oe_get_network_market_data(
 # Get multiple market metrics
 market_data <- oe_get_network_market_data(
   network_code = "NEM",
-  metrics = c("price", "demand", "market_value"),
+  metrics = c("price", "demand"),
   interval = "1d",
   network_region = "VIC1"
 )

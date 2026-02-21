@@ -28,8 +28,7 @@
 #' - Format: "metric" → No grouping columns created
 #'
 #' @keywords internal
-
-
+#' @importFrom rlang :=
 parse_network_data <- function(data,
                                 primary_grouping_name = NULL,
                                 secondary_grouping_name = NULL) {
@@ -59,10 +58,21 @@ parse_network_data <- function(data,
         return(data.frame())
       }
 
+      # Filter out NULL data points - API returns trailing NULLs as padding
+      valid_data <- Filter(Negate(is.null), series$data)
+
+      if (length(valid_data) == 0) {
+        return(data.frame())
+      }
+
       # Extract timestamp/value pairs
+      # value within a point may also be null (e.g. price during market suspension)
       df <- data.frame(
-        datetime = sapply(series$data, `[[`, 1),
-        value = sapply(series$data, `[[`, 2),
+        datetime = sapply(valid_data, `[[`, 1),
+        value = sapply(valid_data, function(x) {
+          v <- x[[2]]
+          if (is.null(v)) NA_real_ else as.numeric(v)
+        }),
         stringsAsFactors = FALSE
       )
 

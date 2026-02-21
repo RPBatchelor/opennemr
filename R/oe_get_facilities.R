@@ -53,11 +53,7 @@ oe_get_facilities <- function(facility_code = NULL,
     valid_statuses <- c("committed", "operating", "retired")
     invalid_statuses <- status_id[!status_id %in% valid_statuses]
     if (length(invalid_statuses) > 0) {
-      stop(sprintf(
-        "Invalid status_id(s): %s. Valid statuses are: %s",
-        paste(invalid_statuses, collapse = ", "),
-        paste(valid_statuses, collapse = ", ")
-      ))
+      stop(glue::glue("Invalid status_id(s): {paste(invalid_statuses, collapse = ', ')}. Valid statuses are: {paste(valid_statuses, collapse = ', ')}"))
     }
   }
 
@@ -66,11 +62,7 @@ oe_get_facilities <- function(facility_code = NULL,
     valid_fueltechs <- oe_fueltechs$fueltech
     invalid_fueltechs <- fueltech_id[!fueltech_id %in% valid_fueltechs]
     if (length(invalid_fueltechs) > 0) {
-      stop(sprintf(
-        "Invalid fueltech_id(s): %s. Valid fueltechs are: %s",
-        paste(invalid_fueltechs, collapse = ", "),
-        paste(valid_fueltechs, collapse = ", ")
-      ))
+      stop(glue::glue("Invalid fueltech_id(s): {paste(invalid_fueltechs, collapse = ', ')}. Valid fueltechs are: {paste(valid_fueltechs, collapse = ', ')}"))
     }
   }
 
@@ -79,11 +71,7 @@ oe_get_facilities <- function(facility_code = NULL,
     valid_networks <- oe_network_list$network_name
     invalid_networks <- network_id[!network_id %in% valid_networks]
     if (length(invalid_networks) > 0) {
-      stop(sprintf(
-        "Invalid network_id(s): %s. Valid networks are: %s",
-        paste(invalid_networks, collapse = ", "),
-        paste(valid_networks, collapse = ", ")
-      ))
+      stop(glue::glue("Invalid network_id(s): {paste(invalid_networks, collapse = ', ')}. Valid networks are: {paste(valid_networks, collapse = ', ')}"))
     }
   }
 
@@ -91,11 +79,7 @@ oe_get_facilities <- function(facility_code = NULL,
   if (!is.null(network_region)) {
     valid_regions <- oe_network_regions$region
     if (!network_region %in% valid_regions) {
-      stop(sprintf(
-        "Invalid network_region '%s'. Valid regions are: %s",
-        network_region,
-        paste(valid_regions, collapse = ", ")
-      ))
+      stop(glue::glue("Invalid network_region '{network_region}'. Valid regions are: {paste(valid_regions, collapse = ', ')}"))
     }
   }
 
@@ -156,13 +140,9 @@ oe_get_facilities <- function(facility_code = NULL,
 
   # Check response status
   if (httr::http_error(response)) {
-    stop(
-      sprintf(
-        "API request failed [%s]: %s",
-        httr::status_code(response),
-        httr::content(response, "text", encoding = "UTF-8")
-      )
-    )
+    status_code <- httr::status_code(response)
+    error_body  <- httr::content(response, "text", encoding = "UTF-8")
+    stop(glue::glue("API request failed [{status_code}]: {error_body}"))
   }
 
   # Parse response

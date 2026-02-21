@@ -192,6 +192,39 @@
 "oe_intervals"
 
 
+#' OpenElectricity API Data Limits
+#'
+#' @description
+#' Reference dataset containing the maximum date range allowed per interval when
+#' querying the OpenElectricity API. Requests exceeding these limits return a 400
+#' error from the API; the package automatically chunks requests that exceed them.
+#'
+#' @format A tibble with 9 rows and 3 columns:
+#' \describe{
+#'   \item{interval}{Interval code (e.g., "5m", "1h", "1d")}
+#'   \item{max_days}{Maximum number of days allowed per API request for this interval}
+#'   \item{max_days_desc}{Human-readable description of the limit (e.g., "8 days")}
+#' }
+#'
+#' @details
+#' Limits by interval:
+#' - **5m**: 8 days
+#' - **1h**: 32 days
+#' - **1d / 7d**: 1 year (366 days)
+#' - **1M / 3M / season**: 2–5 years
+#' - **1y / fy**: ~10 years (3,700 days)
+#'
+#' @examples
+#' # View all data limits
+#' oe_data_limits
+#'
+#' # Find the limit for 5-minute data
+#' subset(oe_data_limits, interval == "5m")
+#'
+#' @source \url{https://docs.openelectricity.org.au/api-reference/data-limits}
+"oe_data_limits"
+
+
 #' OpenElectricity Metrics
 #'
 #' @description

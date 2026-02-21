@@ -94,32 +94,20 @@ oe_get_facility_data <- function(network_code,
   # Validate network_code
   valid_networks <- oe_network_list$network_name
   if (!network_code %in% valid_networks) {
-    stop(sprintf(
-      "Invalid network_code '%s'. Must be one of: %s",
-      network_code,
-      paste(valid_networks, collapse = ", ")
-    ))
+    stop(glue::glue("Invalid network_code '{network_code}'. Must be one of: {paste(valid_networks, collapse = ', ')}"))
   }
 
   # Validate metrics (can be multiple)
   valid_metrics <- oe_metrics$metric
   invalid_metrics <- metrics[!metrics %in% valid_metrics]
   if (length(invalid_metrics) > 0) {
-    stop(sprintf(
-      "Invalid metric(s): %s. Valid metrics are: %s",
-      paste(invalid_metrics, collapse = ", "),
-      paste(valid_metrics, collapse = ", ")
-    ))
+    stop(glue::glue("Invalid metric(s): {paste(invalid_metrics, collapse = ', ')}. Valid metrics are: {paste(valid_metrics, collapse = ', ')}"))
   }
 
   # Validate interval
   valid_intervals <- oe_intervals$interval
   if (!interval %in% valid_intervals) {
-    stop(sprintf(
-      "Invalid interval '%s'. Must be one of: %s",
-      interval,
-      paste(valid_intervals, collapse = ", ")
-    ))
+    stop(glue::glue("Invalid interval '{interval}'. Must be one of: {paste(valid_intervals, collapse = ', ')}"))
   }
 
 
@@ -171,13 +159,9 @@ oe_get_facility_data <- function(network_code,
 
   # Check response status
   if (httr::http_error(response)) {
-    stop(
-      sprintf(
-        "API request failed [%s]: %s",
-        httr::status_code(response),
-        httr::content(response, "text", encoding = "UTF-8")
-      )
-    )
+    status_code <- httr::status_code(response)
+    error_body  <- httr::content(response, "text", encoding = "UTF-8")
+    stop(glue::glue("API request failed [{status_code}]: {error_body}"))
   }
 
   # Parse response
