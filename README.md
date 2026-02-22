@@ -121,126 +121,120 @@ oe_data_limits         # Maximum date range per interval
 
 ## Examples
 
-### Check your account
-
 ``` r
-oe_check_user()
+library(opennemr)
+library(ggplot2)
 ```
 
 ------------------------------------------------------------------------
 
-### Get facility metadata
+### Explore facilities
 
-Retrieve a list of power stations and their attributes. Results can be
-filtered by network, region, fuel technology, and operational status.
-
-``` r
-# All operating facilities in the NEM
-oe_get_facilities(network_id = "NEM", status_id = "operating")
-```
+`oe_get_facilities()` returns a data frame of power stations and their
+generating units. Filter by network, region, fuel technology, and
+operational status.
 
 ``` r
-# All operating wind and solar facilities
-oe_get_facilities(
-  fueltech_id = c("wind", "solar_utility"),
+wind_farms <- oe_get_facilities(
+  network_id  = "NEM",
+  fueltech_id = "wind",
   status_id   = "operating"
 )
-```
+#> Fetched 99 records.
 
-``` r
-# Facilities in Victoria
-oe_get_facilities(network_region = "VIC1")
-```
-
-``` r
-# A specific facility by code
-oe_get_facilities(facility_code = "LOYYANGA")
+wind_farms[, c("code", "name", "network_region",
+               "units_capacity_registered", "units_status_id")]
+#> # A tibble: 110 × 5
+#>    code     name       network_region units_capacity_registered units_status_id
+#>    <chr>    <chr>      <chr>                              <dbl> <chr>          
+#>  1 ARWF     Ararat     VIC1                               242.  operating      
+#>  2 BHWF     Bald Hills VIC1                               107.  operating      
+#>  3 BANGOWF  Bango      NSW1                               159   operating      
+#>  4 BANGOWF  Bango      NSW1                                84.8 operating      
+#>  5 BRYB1WF1 Berrybank  VIC1                               109   operating      
+#>  6 BRYB1WF1 Berrybank  VIC1                               181.  operating      
+#>  7 BIALAWF  Biala      NSW1                               110   operating      
+#>  8 BLAYNEY  Blayney    NSW1                                 9.9 operating      
+#>  9 BOCOROCK Boco Rock  NSW1                               113.  operating      
+#> 10 BODWF    Bodangora  NSW1                               113.  operating      
+#> # ℹ 100 more rows
 ```
 
 ------------------------------------------------------------------------
 
-### Get network generation data
+### Network generation by region
 
-`oe_get_network_data()` returns generation and emissions time series
-aggregated across a network. Supported metrics: `power`, `energy`,
-`emissions`. **One metric per call.**
-
-``` r
-# Hourly power output for the NEM — 1 day
-oe_get_network_data(
-  network_code = "NEM",
-  metrics      = "power",
-  interval     = "1h",
-  date_start   = "2025-01-01",
-  date_end     = "2025-01-02"
-)
-```
+`oe_get_network_data()` returns generation time series aggregated across
+a network. Supported metrics: `power`, `energy`, `emissions`. **One
+metric per call.**
 
 ``` r
-# Daily energy by region
-oe_get_network_data(
+regional_power <- oe_get_network_data(
   network_code     = "NEM",
-  metrics          = "energy",
-  interval         = "1d",
-  date_start       = "2025-01-01",
-  date_end         = "2025-01-31",
+  metrics          = "power",
+  interval         = "1h",
+  date_start       = "2025-01-06",
+  date_end         = "2025-01-12",
   primary_grouping = "network_region"
 )
 ```
 
+``` r
+ggplot(regional_power, aes(x = datetime, y = value, colour = network_region)) +
+  geom_line(linewidth = 0.4, alpha = 0.8) +
+  labs(
+    title  = "NEM Regional Power Output",
+    x      = NULL,
+    y      = "Power (MW)",
+    colour = "Region"
+  ) +
+  theme_minimal()
+```
+
+<img src="man/figures/README-chart-network-power-1.png" width="100%" />
+
 ------------------------------------------------------------------------
 
-### Get network market data
+### Regional electricity prices
 
 `oe_get_network_market_data()` returns price and demand time series.
 Multiple metrics can be requested in a single call.
 
 ``` r
-# Hourly price and demand data in the NEM
-oe_get_network_market_data(
-  network_code = "NEM",
-  metrics      = c("price", "demand"),
-  interval     = "1h",
-  date_start   = "2025-01-01",
-  date_end     = "2025-01-02"
-)
-```
-
-``` r
-# Regional price breakdown
-oe_get_network_market_data(
+regional_prices <- oe_get_network_market_data(
   network_code     = "NEM",
   metrics          = "price",
   interval         = "1h",
-  date_start       = "2025-01-01",
-  date_end         = "2025-01-02",
+  date_start       = "2025-01-06",
+  date_end         = "2025-01-12",
   primary_grouping = "network_region"
 )
 ```
 
-------------------------------------------------------------------------
-
-### Get facility-level time series data
-
-`oe_get_facility_data()` returns time series for individual facilities.
-Multiple metrics can be requested in a single call. Use
-`oe_get_facilities()` to find valid facility codes.
-
 ``` r
-# Power and emissions for Loy Yang A
-oe_get_facility_data(
-  network_code  = "NEM",
-  metrics       = c("power", "emissions"),
-  facility_code = "LOYYANGA",
-  interval      = "1h",
-  date_start    = "2025-01-01",
-  date_end      = "2025-01-02"
-)
+ggplot(regional_prices, aes(x = datetime, y = value, colour = network_region)) +
+  geom_line(linewidth = 0.4, alpha = 0.8) +
+  labs(
+    title  = "NEM Regional Electricity Price",
+    x      = NULL,
+    y      = "Price ($/MWh)",
+    colour = "Region"
+  ) +
+  theme_minimal()
 ```
 
+<img src="man/figures/README-chart-market-price-1.png" width="100%" />
+
+------------------------------------------------------------------------
+
+### Facility-level generation
+
+`oe_get_facility_data()` returns time series for individual generating
+units within a facility. Multiple metrics can be requested in a single
+call. Use `oe_get_facilities()` to find valid facility codes.
+
 ``` r
-# Daily energy for a facility over a month
-oe_get_facility_data(
+lya_energy <- oe_get_facility_data(
   network_code  = "NEM",
   metrics       = "energy",
   facility_code = "LOYYANGA",
@@ -249,6 +243,23 @@ oe_get_facility_data(
   date_end      = "2025-01-31"
 )
 ```
+
+``` r
+ggplot(lya_energy, 
+       aes(x = datetime, 
+           y = value, 
+           fill = unit_code)) +
+  geom_area() +
+  labs(
+    title = "Loy Yang A — Daily Energy Output (January 2025)",
+    x     = NULL,
+    y     = "Energy (MWh)",
+    fill  = "Unit"
+  ) +
+  theme_minimal()
+```
+
+<img src="man/figures/README-chart-facility-1.png" width="100%" />
 
 ------------------------------------------------------------------------
 
@@ -265,4 +276,5 @@ website](https://openelectricity.org.au/).
 ## Bugs, feedback and contributions
 
 This package is in active development. Feedback and bug identification
-is welcome. Issues or code contribution can be done via github.
+is welcome. Issues or code contributions can be made via
+[GitHub](https://github.com/RPBatchelor/opennemr).
