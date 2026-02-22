@@ -225,38 +225,75 @@
 "oe_data_limits"
 
 
+#' OpenElectricity Primary Groupings
+#'
+#' @description
+#' Reference dataset containing valid primary grouping options for network data
+#' API queries.
+#'
+#' @format A tibble with 2 rows and 2 columns:
+#' \describe{
+#'   \item{primary_grouping}{Grouping identifier code}
+#'   \item{grouping_desc}{Description of the grouping}
+#' }
+#'
+#' @source \url{https://docs.openelectricity.org.au/api-reference/data/get-network-data}
+"oe_primary_groupings"
+
+
+#' OpenElectricity Secondary Groupings
+#'
+#' @description
+#' Reference dataset containing valid secondary grouping options for network data
+#' API queries. Secondary groupings add a second dimension on top of the primary
+#' grouping.
+#'
+#' @format A tibble with 4 rows and 2 columns:
+#' \describe{
+#'   \item{secondary_grouping}{Grouping identifier code}
+#'   \item{grouping_desc}{Description of the grouping}
+#' }
+#'
+#' @source \url{https://docs.openelectricity.org.au/api-reference/data/get-network-data}
+"oe_secondary_groupings"
+
+
 #' OpenElectricity Metrics
 #'
 #' @description
 #' Reference dataset containing available metrics that can be queried from the API.
 #'
-#' @format A tibble with 8 rows and 3 columns:
+#' @format A tibble with 7 rows and 4 columns:
 #' \describe{
 #'   \item{metric}{Metric identifier code}
 #'   \item{metric_attribute}{Description of what the metric measures}
 #'   \item{metric_unit}{Unit of measurement}
+#'   \item{api_working}{Logical. TRUE if the metric is supported by \code{oe_get_network_data()}.
+#'     Metrics marked FALSE return a 400 error from the network data endpoint as of API v4.4.12.}
 #' }
 #'
 #' @details
-#' Available metrics include:
-#' - **power**: Instantaneous power output/consumption (MW)
-#' - **energy**: Energy generated/consumed over time (MWh)
-#' - **price**: Price per unit of energy ($/MWh)
-#' - **market_value**: Total market value ($)
-#' - **demand**: Demand for power (MW)
-#' - **demand_energy**: Demand for energy (MWh)
-#' - **emissions**: CO2 equivalent emissions (tonnes)
-#' - **renewable_proportion**: Percentage of renewable energy (%)
+#' Available metrics and their support in \code{oe_get_network_data()}:
+#' - **power** (TRUE): Instantaneous power output/consumption (MW)
+#' - **energy** (TRUE): Energy generated/consumed over time (MWh)
+#' - **emissions** (TRUE): CO2 equivalent emissions (tonnes)
+#' - **price** (FALSE): Use \code{oe_get_network_market_data()} instead
+#' - **demand** (FALSE): Use \code{oe_get_network_market_data()} instead
+#' - **demand_energy** (FALSE): Use \code{oe_get_network_market_data()} instead
+#' - **renewable_proportion** (FALSE): Not currently supported by any endpoint
 #'
-#' Note: Currently, `oe_get_network_data()` only supports querying one metric
-#' at a time due to API v4 limitations.
+#' Note: `market_value` is listed in the API docs but returns a 400 error from all
+#' endpoints and has been excluded from this table.
+#'
+#' Note: \code{oe_get_network_data()} only supports querying one metric at a time
+#' due to API v4 limitations.
 #'
 #' @examples
 #' # View all metrics
 #' oe_metrics
 #'
-#' # Get metric units
-#' oe_metrics[, c("metric", "metric_unit")]
+#' # See which metrics work with oe_get_network_data()
+#' subset(oe_metrics, api_working)
 #'
 #' @source OpenElectricity API v4
 "oe_metrics"

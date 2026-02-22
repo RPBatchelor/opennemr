@@ -5,11 +5,13 @@
 \alias{oe_metrics}
 \title{OpenElectricity Metrics}
 \format{
-A tibble with 8 rows and 3 columns:
+A tibble with 7 rows and 4 columns:
 \describe{
   \item{metric}{Metric identifier code}
   \item{metric_attribute}{Description of what the metric measures}
   \item{metric_unit}{Unit of measurement}
+  \item{api_working}{Logical. TRUE if the metric is supported by \code{oe_get_network_data()}.
+    Metrics marked FALSE return a 400 error from the network data endpoint as of API v4.4.12.}
 }
 }
 \source{
@@ -22,25 +24,27 @@ oe_metrics
 Reference dataset containing available metrics that can be queried from the API.
 }
 \details{
-Available metrics include:
-- **power**: Instantaneous power output/consumption (MW)
-- **energy**: Energy generated/consumed over time (MWh)
-- **price**: Price per unit of energy ($/MWh)
-- **market_value**: Total market value ($)
-- **demand**: Demand for power (MW)
-- **demand_energy**: Demand for energy (MWh)
-- **emissions**: CO2 equivalent emissions (tonnes)
-- **renewable_proportion**: Percentage of renewable energy (%)
+Available metrics and their support in \code{oe_get_network_data()}:
+- **power** (TRUE): Instantaneous power output/consumption (MW)
+- **energy** (TRUE): Energy generated/consumed over time (MWh)
+- **emissions** (TRUE): CO2 equivalent emissions (tonnes)
+- **price** (FALSE): Use \code{oe_get_network_market_data()} instead
+- **demand** (FALSE): Use \code{oe_get_network_market_data()} instead
+- **demand_energy** (FALSE): Use \code{oe_get_network_market_data()} instead
+- **renewable_proportion** (FALSE): Not currently supported by any endpoint
 
-Note: Currently, `oe_get_network_data()` only supports querying one metric
-at a time due to API v4 limitations.
+Note: `market_value` is listed in the API docs but returns a 400 error from all
+endpoints and has been excluded from this table.
+
+Note: \code{oe_get_network_data()} only supports querying one metric at a time
+due to API v4 limitations.
 }
 \examples{
 # View all metrics
 oe_metrics
 
-# Get metric units
-oe_metrics[, c("metric", "metric_unit")]
+# See which metrics work with oe_get_network_data()
+subset(oe_metrics, api_working)
 
 }
 \keyword{datasets}

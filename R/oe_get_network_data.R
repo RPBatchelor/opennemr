@@ -113,6 +113,16 @@ oe_get_network_data <- function(network_code,
     stop(glue::glue("Invalid metric '{metrics}'. Valid metrics are: {paste(valid_metrics, collapse = ', ')}"))
   }
 
+  # Check metric is supported by this endpoint
+  if (!oe_metrics$api_working[oe_metrics$metric == metrics]) {
+    working_metrics <- oe_metrics$metric[oe_metrics$api_working]
+    stop(glue::glue(
+      "Metric '{metrics}' is not supported by oe_get_network_data() (returns a 400 error from the API). ",
+      "Supported metrics are: {paste(working_metrics, collapse = ', ')}. ",
+      "For price and demand metrics, use oe_get_network_market_data() instead."
+    ))
+  }
+
   # Validate interval
   valid_intervals <- oe_intervals$interval
   if (!interval %in% valid_intervals) {
@@ -140,6 +150,20 @@ oe_get_network_data <- function(network_code,
     valid_fueltech_groups <- oe_fueltech_groups$fueltech_group
     if (!fueltech_group %in% valid_fueltech_groups) {
       stop(glue::glue("Invalid fueltech_group '{fueltech_group}'. Must be one of: {paste(valid_fueltech_groups, collapse = ', ')}"))
+    }
+  }
+
+  # Validate primary_grouping
+  valid_primary_groupings <- oe_primary_groupings$primary_grouping
+  if (!primary_grouping %in% valid_primary_groupings) {
+    stop(glue::glue("Invalid primary_grouping '{primary_grouping}'. Must be one of: {paste(valid_primary_groupings, collapse = ', ')}"))
+  }
+
+  # Validate secondary_grouping if provided
+  if (!is.null(secondary_grouping)) {
+    valid_secondary_groupings <- oe_secondary_groupings$secondary_grouping
+    if (!secondary_grouping %in% valid_secondary_groupings) {
+      stop(glue::glue("Invalid secondary_grouping '{secondary_grouping}'. Must be one of: {paste(valid_secondary_groupings, collapse = ', ')}"))
     }
   }
 

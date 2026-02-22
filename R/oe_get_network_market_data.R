@@ -126,9 +126,9 @@ oe_get_network_market_data <- function(network_code,
   }
 
   # Validate primary_grouping
-  valid_groupings <- c("network", "network_region")
-  if (!primary_grouping %in% valid_groupings) {
-    stop(glue::glue("Invalid primary_grouping '{primary_grouping}'. Must be one of: {paste(valid_groupings, collapse = ', ')}"))
+  valid_primary_groupings <- oe_primary_groupings$primary_grouping
+  if (!primary_grouping %in% valid_primary_groupings) {
+    stop(glue::glue("Invalid primary_grouping '{primary_grouping}'. Must be one of: {paste(valid_primary_groupings, collapse = ', ')}"))
   }
 
 

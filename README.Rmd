@@ -10,180 +10,240 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%",
-  echo = TRUE
+  eval = FALSE
 )
 ```
 
 # opennemr
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 ## Overview
 
-The goal of {opennemr} is to provide simple access to the Open Electricity (formerly OpenNEM) API via R.
+{opennemr} provides R access to the [OpenElectricity API](https://openelectricity.org.au/) (v4), which publishes Australian electricity market data for:
 
-The [OpenElectricity project](https://openelectricity.org.au/) aims to make Australian energy 
-network data more accessible to a wider audience through a website portal and 
-data access API’s and tools.
+-   **NEM** — National Electricity Market (eastern and southern Australia)
+-   **WEM** — Wholesale Electricity Market (Western Australia)
+-   **AEMO_ROOFTOP** — AEMO rooftop solar estimates
+-   **APVI** — Australian PV Institute solar data
 
-Through the webportal and API, OpenElectricity provides access to:
-* National Electricity Market (NEM) data
-* Wholesale Electricity Market (WEM) data
-* Australian PV Institute (APVI) data
-
-{opennemr} provides a simple interface for R to access the public API provided
-to OpenElectricity. Each of the endpoints documented in the [API documentation](https://api.opennem.org.au/docs) 
-have been implemented in {opennemr}. 
-
-The {opennemr} package is current as of OpenElectricity API v4.
-
-
-## API key
-
-To use {opennemr} you will need an API key from OpenElectricity. 
-You can request access from the [OpenElectricity developer platform](https://platform.openelectricity.org.au)
-
+The package is current as of **OpenElectricity API v4**.
 
 ## Installation
 
-{opennemr} is not yet available on CRAN.
+{opennemr} is not yet on CRAN. Install the development version from GitHub:
 
-You can install the development version of opennemr from [GitHub](https://github.com/) with:
-
-``` r
-# if you don't have devtools installed, first run:
+```{r install}
 # install.packages("devtools")
 devtools::install_github("RPBatchelor/opennemr")
 ```
 
-## Using {opennemr}
+## API Key
 
-First we'll load the {opennemr} package and the {tidyverse}
+All functions require an API key from OpenElectricity. Request access at the [OpenElectricity developer platform](https://platform.openelectricity.org.au).
 
-```{r network list example}
-#library(opennemr)
-library(tidyverse)
-```
+Store your key in your R environment so it is never hard-coded in scripts:
 
-It is recommended that you save your API key in your system environment, and don't push this to public repositories such as GitHub. 
-
-```{r}
-# Run this code in your R console
+```{r api-key-setup}
+# Opens .Renviron — add the line below, then save and restart R
 usethis::edit_r_environ()
-
-# Then manually add this line and save:
-# OPEN_ELECTRICITY_API_KEY = <your_actual_api_key_here>
+# OPEN_ELECTRICITY_API_KEY=your_key_here
 ```
 
-Once you have done this, restart your R session and then run the below function from the {opennemr} pacakge
+Verify your key is working:
 
-```{r}
-# oe_check_user()
+```{r check-user}
+library(opennemr)
 
+oe_check_user()
 ```
 
+## Functions
 
+| Function | Description |
+|------------------------------------|------------------------------------|
+| `oe_check_user()` | Verify API key and view account details |
+| `oe_get_facilities()` | Retrieve facility (power station) metadata |
+| `oe_get_network_data()` | Network-level generation and emissions time series |
+| `oe_get_network_market_data()` | Network-level market time series (price, demand) |
+| `oe_get_facility_data()` | Facility-level time series data |
 
-### Time series data
+## Metric Availability by Function
 
-Now  we'll look to download some actual power data for a given station. 
-From the *stations* list we know the station code for Loy Yang A is *LOYYANGA* 
-and this station is on the NEM network. We can get data at 30 minute intervals 
-for a period of 7 days using the below:
+Not all metrics are available from every endpoint. The table below shows which metrics are supported by each function call. Unsupported combinations return a 400 error from the API; {opennemr} will stop with a clear message before making the request.
 
-```{r}
-#lya_power <- get_power_by_station(network_code = "NEM",
-                                  # station_code = "LOYYANGA",
-                                  # interval = "30m", 
-                                  # period = "7d")
+| Metric | `oe_get_network_data()` | `oe_get_network_market_data()` | `oe_get_facility_data()` |
+|-----------------|:-----------------:|:-----------------:|:-----------------:|
+| `power` | ✓ | ✓ | ✓ |
+| `energy` | ✓ | ✓ | ✓ |
+| `emissions` | ✓ | ✓ | ✓ |
+| `price` | ✗ | ✓ | — |
+| `demand` | ✗ | ✓ | — |
+| `demand_energy` | ✗ | ✓ | — |
+| `renewable_proportion` | ✗ | ✓ | — |
 
+> **Note:** `market_value` is listed in the OpenElectricity API documentation but returns a 400 error from all endpoints as of API v4.4.12. It has been excluded from {opennemr} until the API supports it.
+
+## Known Limitations
+
+-   **`oe_get_network_data()` supports one metric per call.** The API returns a 500 error when multiple metrics are requested simultaneously. Request metrics individually and combine the results.
+-   **`oe_get_network_data()` supports only NEM and WEM.** The `AEMO_ROOFTOP` and `APVI` networks return a 400 error from this endpoint.
+-   **`oe_get_network_market_data()` supports only NEM and WEM**, for the same reason.
+-   **Date range limits apply per interval.** Requests exceeding the limit for a given interval will prompt you to confirm before making multiple chunked API calls automatically. See `oe_data_limits` for the limits per interval.
+
+## Reference Data
+
+{opennemr} exports several datasets for exploring valid parameter values:
+
+```{r reference-data}
+oe_network_list        # Available networks
+oe_network_regions     # Regions per network
+oe_fueltechs           # Fuel technology codes
+oe_fueltech_groups     # Fuel technology group codes
+oe_metrics             # Available metrics and which endpoints support them
+oe_intervals           # Valid time intervals
+oe_primary_groupings   # Valid primary_grouping values
+oe_secondary_groupings # Valid secondary_grouping values
+oe_data_limits         # Maximum date range per interval
 ```
 
-This is what the data looks like:
+------------------------------------------------------------------------
 
-```{r}
-#str(lya_power)
+## Examples
 
+### Check your account
+
+```{r example-check-user}
+oe_check_user()
 ```
 
-It's now very simple to chart the power output of each generator at Loy Yan A
-over time
+------------------------------------------------------------------------
 
-```{r}
-# (p <- lya_power |> 
-#     ggplot(aes(x = period_start, y = value)) +
-#     geom_line() +
-#     facet_wrap(~code) + 
-#     theme_grey() +
-#     labs(x = "Period start",
-#          y = "Power (MW)")
-# )
+### Get facility metadata
+
+Retrieve a list of power stations and their attributes. Results can be filtered by network, region, fuel technology, and operational status.
+
+```{r example-facilities-all}
+# All operating facilities in the NEM
+oe_get_facilities(network_id = "NEM", status_id = "operating")
 ```
 
-The period of time over which you can download data for a given station can be 
-found by running {get_period_list()}. Similarly, the intervals between data points
-can be found by running {get_interval_list()}. 
-
-**Note** The OpenNEM API developer documentation indicates that start and end 
-dates can be called within the REST API, but this has not yet been build into 
-the functionality of {opennem}. For now, specifying the *period* in the function
-call will download data from the current date backwards by the specified duration.
-
-
-We can also download all power generation data by fueltech for a given network.
-Let's get all generation data for Victoria (region code *VIC1*) for the month 
-of March 2023.
-
-
-```{r}
-
-# vic_power_fueltech <- get_power_by_fueltech_region(network_code = "NEM",
-#                                                    network_region_code = "VIC1",
-#                                                    month = "2023-03-01")
-
+```{r example-facilities-fueltech}
+# All operating wind and solar facilities
+oe_get_facilities(
+  fueltech_id = c("wind", "solar_utility"),
+  status_id   = "operating"
+)
 ```
 
-**Note** The way the API works for this particular endpoint is that both
-power and price data are returned
-
-```{r}
-# unique(vic_power_fueltech$type)
+```{r example-facilities-region}
+# Facilities in Victoria
+oe_get_facilities(network_region = "VIC1")
 ```
 
-Therefore,, filter for either of these variables once you've got the data. 
-Below charts power by fueltech for a 1 week period
-
-```{r}
-# (p <- vic_power_fueltech |> 
-#     filter(period_start >= "2023-03-24",
-#            period_start < "2023-03-31",
-#            type == "power") |> 
-#     ggplot() +
-#     geom_area(aes(x = period_start,
-#                   y = value, 
-#                   fill = fueltech),
-#               show.legend = TRUE) +
-#     theme_grey() +
-#     labs(x = "Period start",
-#          y = "Power (MW)",
-#          fill = "Fuel technology")
-# )
+```{r example-facilities-code}
+# A specific facility by code
+oe_get_facilities(facility_code = "LOYYANGA")
 ```
 
+------------------------------------------------------------------------
+
+### Get network generation data
+
+`oe_get_network_data()` returns generation and emissions time series aggregated across a network. Supported metrics: `power`, `energy`, `emissions`. **One metric per call.**
+
+```{r example-network-power}
+# Hourly power output for the NEM — 1 day
+oe_get_network_data(
+  network_code = "NEM",
+  metrics      = "power",
+  interval     = "1h",
+  date_start   = "2025-01-01",
+  date_end     = "2025-01-02"
+)
+```
+
+```{r example-network-energy-region}
+# Daily energy by region
+oe_get_network_data(
+  network_code     = "NEM",
+  metrics          = "energy",
+  interval         = "1d",
+  date_start       = "2025-01-01",
+  date_end         = "2025-01-31",
+  primary_grouping = "network_region"
+)
+```
+
+------------------------------------------------------------------------
+
+### Get network market data
+
+`oe_get_network_market_data()` returns price and demand time series. Multiple metrics can be requested in a single call.
+
+```{r example-market-multi}
+# Hourly price and demand data in the NEM
+oe_get_network_market_data(
+  network_code = "NEM",
+  metrics      = c("price", "demand"),
+  interval     = "1h",
+  date_start   = "2025-01-01",
+  date_end     = "2025-01-02"
+)
+```
+
+```{r example-market-regional}
+# Regional price breakdown
+oe_get_network_market_data(
+  network_code     = "NEM",
+  metrics          = "price",
+  interval         = "1h",
+  date_start       = "2025-01-01",
+  date_end         = "2025-01-02",
+  primary_grouping = "network_region"
+)
+```
+
+------------------------------------------------------------------------
+
+### Get facility-level time series data
+
+`oe_get_facility_data()` returns time series for individual facilities. Multiple metrics can be requested in a single call. Use `oe_get_facilities()` to find valid facility codes.
+
+```{r example-facility-multi-metric}
+# Power and emissions for Loy Yang A
+oe_get_facility_data(
+  network_code  = "NEM",
+  metrics       = c("power", "emissions"),
+  facility_code = "LOYYANGA",
+  interval      = "1h",
+  date_start    = "2025-01-01",
+  date_end      = "2025-01-02"
+)
+```
+
+```{r example-facility-daily}
+# Daily energy for a facility over a month
+oe_get_facility_data(
+  network_code  = "NEM",
+  metrics       = "energy",
+  facility_code = "LOYYANGA",
+  interval      = "1d",
+  date_start    = "2025-01-01",
+  date_end      = "2025-01-31"
+)
+```
+
+------------------------------------------------------------------------
 
 ## Disclaimer
-The {opennemr} pacakge is not associated with the OpenElectricity team, and has been 
-developed independently to facilitate a straightforward access to the API backend
-in R. All data is provided subject to any restrictions and licensing arrangements
-noted on the OpenElectricity website. 
 
+{opennemr} is not affiliated with the OpenElectricity team and has been developed independently to provide straightforward R access to the API. All data is provided subject to the restrictions and licensing arrangements noted on the [OpenElectricity website](https://openelectricity.org.au/).
 
+------------------------------------------------------------------------
 
-
-
-
-
-
-
+## Bugs, feedback and contributions
+This package is in active development. Feedback and bug identification is welcome. Issues or code contribution can be done via github. 
 

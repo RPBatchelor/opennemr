@@ -101,18 +101,19 @@ oe_intervals <- tibble::tribble(
 )
 
 oe_metrics <- tibble::tribble(
-  ~metric,                  ~metric_attribute,                             ~metric_unit,
-  "power",                  "Instantaneous power output/consumption (MW)", "MW",
-  "energy",                 "Energy generated/consumed over time (MWh)",   "MWh",
-  "price",                  "Price per unit of energy ($/MWh)",            "$/MWh",
-  # NOTE: "market_value" is listed as a supported metric in the OpenElectricity
-  # API docs (https://docs.openelectricity.org.au/api-reference/market/get-network-data)
-  # but returns a 400 error ("Unsupported metrics: market_value") as of API v4.4.12.
-  # Removed from oe_metrics until the API actually supports it.
-  "demand",                 "Demand for power (MW)",                        "MW",
-  "demand_energy",          "Demand for energy (MWh)",                      "MWh",
-  "emissions",              "CO2 equivalent emissions (tonnes)",            "tCO2-e",
-  "renewable_proportion",   "Percentage of renewable energy (%)",           "%"
+  ~metric,                  ~metric_attribute,                             ~metric_unit,  ~api_working,
+  # NOTE: api_working refers to oe_get_network_data() only. Metrics marked FALSE return
+  # a 400 error from the network data endpoint as of API v4.4.12.
+  # price and demand metrics are available via oe_get_network_market_data() instead.
+  # "market_value" is listed in the API docs but returns a 400 error from all endpoints
+  # and has been excluded from this table entirely.
+  "power",                  "Instantaneous power output/consumption (MW)", "MW",          TRUE,
+  "energy",                 "Energy generated/consumed over time (MWh)",   "MWh",         TRUE,
+  "price",                  "Price per unit of energy ($/MWh)",            "$/MWh",       FALSE,
+  "demand",                 "Demand for power (MW)",                       "MW",          FALSE,
+  "demand_energy",          "Demand for energy (MWh)",                     "MWh",         FALSE,
+  "emissions",              "CO2 equivalent emissions (tonnes)",           "tCO2-e",      TRUE,
+  "renewable_proportion",   "Percentage of renewable energy (%)",          "%",           FALSE
 )
 
 # Data limits per interval - from API docs:
@@ -129,6 +130,23 @@ oe_data_limits <- tibble::tribble(
   "season",  1830,      "5 years (1,830 days)",
   "1y",      3700,      "~10 years (3,700 days)",
   "fy",      3700,      "~10 years (3,700 days)"
+)
+
+
+# Grouping options for network data endpoints
+# Source: https://docs.openelectricity.org.au/api-reference/data/get-network-data
+oe_primary_groupings <- tibble::tribble(
+  ~primary_grouping,  ~grouping_desc,
+  "network",          "Aggregate data at the network level",
+  "network_region",   "Aggregate data by network region (NSW1, VIC1, etc.)"
+)
+
+oe_secondary_groupings <- tibble::tribble(
+  ~secondary_grouping, ~grouping_desc,
+  "fueltech",          "Break down by individual fuel technology (coal_black, wind, etc.)",
+  "fueltech_group",    "Break down by fuel technology group (coal, renewables, etc.)",
+  "status",            "Break down by facility status (operating, retired, etc.)",
+  "renewable",         "Break down by renewable vs non-renewable"
 )
 
 
@@ -153,6 +171,8 @@ usethis::use_data(oe_fueltechs, overwrite = TRUE)
 usethis::use_data(oe_intervals, overwrite = TRUE)
 usethis::use_data(oe_metrics, overwrite = TRUE)
 usethis::use_data(oe_data_limits, overwrite = TRUE)
+usethis::use_data(oe_primary_groupings, overwrite = TRUE)
+usethis::use_data(oe_secondary_groupings, overwrite = TRUE)
 
 # Export internal data (not visible to users, only to package functions)
 usethis::use_data(oe_endpoints, internal = TRUE, overwrite = TRUE)
