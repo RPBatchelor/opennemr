@@ -45,8 +45,9 @@ get_power_by_fueltech_region <- function(network_code,
     type_list <- raw_data$data$type
     unit_list <- raw_data$data$units
 
-    data <- raw_data |>
-      dplyr::bind_rows()
+    data <- raw_data$data |>
+      dplyr::bind_rows() |>
+      tidyr::unnest(c(history))
 
     data_historical <- raw_data$data$history
 

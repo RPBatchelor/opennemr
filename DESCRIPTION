@@ -1,30 +1,32 @@
 Package: opennemr
 Type: Package
-Title: Access to the OpenNEM API via R
-Version: 0.1.0
+Title: Access to the OpenElectricity API via R
+Version: 0.2.0
 Authors@R: c(
   person("Ryan", "Batchelor", role = c("aut", "cre"), email = "ryanbatchelor87@gmail.com"))
 Maintainer: Ryan Batchelor <ryanbatchelor87@gmail.com>
-Description: A package for programatically accessing the OpenNEM API via R. 
-    Several basic functions allow 'opennemr' to access the various API calls provided 
-    by the OpenNEM API (https://opennem.org.au/) to access NEM/WEM data and output
-    data to an R dataframe. 
+Description: Provides programmatic access to the OpenElectricity API (v4), formerly
+    known as OpenNEM. Functions retrieve Australian electricity market time series data
+    for the National Electricity Market (NEM) and Wholesale Electricity Market (WEM),
+    including generation, emissions, price, and demand metrics at network, regional,
+    and facility level.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-Imports: 
+Imports:
     dplyr,
-    httr,
-    jsonlite,
-    tidyr,
     glue,
-    tibble,
-    assertthat,
-    janitor,
+    httr,
+    httr2,
+    purrr,
+    rlang,
     stringr,
-    chromote
+    tibble,
+    tidyr,
 URL: https://github.com/RPBatchelor/opennemr
+Depends: 
+    R (>= 4.4)

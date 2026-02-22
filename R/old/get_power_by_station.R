@@ -47,7 +47,7 @@ get_power_by_station <- function(network_code,
     raw_data <- jsonlite::fromJSON(response_content)
 
     data <- raw_data$data |>
-      tidyr::unnest() |>
+      tidyr::unnest(cols = c(history)) |>
       tidyr::unnest(data) |>
       dplyr::select(code, network, data_type, units, data) |>
       dplyr::mutate(data = as.numeric(data))
@@ -94,7 +94,9 @@ get_power_by_station <- function(network_code,
   }
 
   facility_data_full <- facility_data_full |>
-    dplyr::rename("value" = "data")
+    dplyr::rename("value" = "data") |>
+    rename("facility_code" = "code") |>
+    mutate(station_code = station_code, .before = "facility_code")
 
   return(facility_data_full)
 
