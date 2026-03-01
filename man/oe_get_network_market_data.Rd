@@ -13,7 +13,8 @@ oe_get_network_market_data(
   network_region = NULL,
   primary_grouping = "network",
   with_clerk = TRUE,
-  api_key = NULL
+  api_key = NULL,
+  split_confirm = TRUE
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ Note: "market_value" is listed in the API docs but returns a 400 error as of API
 \item{with_clerk}{Logical. Include clerk data in response. Default: TRUE.}
 
 \item{api_key}{Character. OpenElectricity API key. If NULL, uses OPEN_ELECTRICITY_API_KEY environment variable. Default: NULL.}
+
+\item{split_confirm}{Logical. If TRUE (default), prompts for user confirmation before making multiple chunked API calls when the date range exceeds the API limit. Set to FALSE to proceed automatically without prompting, which is useful for programmatic/non-interactive use. Default: TRUE.}
 }
 \value{
 Data frame with columns:

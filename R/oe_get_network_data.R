@@ -18,6 +18,7 @@
 #' @param secondary_grouping Character. Secondary grouping for data aggregation. Default: NULL.
 #' @param with_clerk Logical. Include clerk data in response. Default: TRUE.
 #' @param api_key Character. OpenElectricity API key. If NULL, uses OPEN_ELECTRICITY_API_KEY environment variable. Default: NULL.
+#' @param split_confirm Logical. If TRUE (default), prompts for user confirmation before making multiple chunked API calls when the date range exceeds the API limit. Set to FALSE to proceed automatically without prompting, which is useful for programmatic/non-interactive use. Default: TRUE.
 #'
 #' @return Data frame with columns:
 #' \describe{
@@ -75,7 +76,8 @@ oe_get_network_data <- function(network_code,
                                 primary_grouping = "network",
                                 secondary_grouping = NULL,
                                 with_clerk = TRUE,
-                                api_key = NULL
+                                api_key = NULL,
+                                split_confirm = TRUE
                                 ){
 
   # Validate required inputs and dependencies
@@ -174,13 +176,15 @@ oe_get_network_data <- function(network_code,
     if (limit_info$exceeds) {
       message(glue::glue("You have asked for a duration that exceeds the standard limit for the '{interval}' interval ({limit_info$max_days_desc}).
 This will require {limit_info$n_chunks} separate API calls."))
-      if (!interactive()) {
-        stop("Date range exceeds API limit. Reduce the date range or make multiple requests manually.")
-      }
-      response <- readline("Would you like to proceed? (y/n): ")
-      if (tolower(trimws(response)) != "y") {
-        message("Request cancelled.")
-        return(invisible(NULL))
+      if (split_confirm) {
+        if (!interactive()) {
+          stop("Date range exceeds API limit. Reduce the date range or make multiple requests manually.")
+        }
+        response <- readline("Would you like to proceed? (y/n): ")
+        if (tolower(trimws(response)) != "y") {
+          message("Request cancelled.")
+          return(invisible(NULL))
+        }
       }
       message(glue::glue("Making {limit_info$n_chunks} API calls..."))
       results <- lapply(seq_along(limit_info$chunks), function(i) {
@@ -198,7 +202,8 @@ This will require {limit_info$n_chunks} separate API calls."))
           primary_grouping  = primary_grouping,
           secondary_grouping = secondary_grouping,
           with_clerk        = with_clerk,
-          api_key           = api_key
+          api_key           = api_key,
+          split_confirm     = split_confirm
         )
       })
       return(do.call(rbind, results))

@@ -16,7 +16,8 @@ oe_get_network_data(
   primary_grouping = "network",
   secondary_grouping = NULL,
   with_clerk = TRUE,
-  api_key = NULL
+  api_key = NULL,
+  split_confirm = TRUE
 )
 }
 \arguments{
@@ -44,6 +45,8 @@ Note: "AEMO_ROOFTOP" and "APVI" are not supported by this endpoint (API returns 
 \item{with_clerk}{Logical. Include clerk data in response. Default: TRUE.}
 
 \item{api_key}{Character. OpenElectricity API key. If NULL, uses OPEN_ELECTRICITY_API_KEY environment variable. Default: NULL.}
+
+\item{split_confirm}{Logical. If TRUE (default), prompts for user confirmation before making multiple chunked API calls when the date range exceeds the API limit. Set to FALSE to proceed automatically without prompting, which is useful for programmatic/non-interactive use. Default: TRUE.}
 }
 \value{
 Data frame with columns:

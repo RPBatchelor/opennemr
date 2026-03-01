@@ -1,7 +1,7 @@
 Package: opennemr
 Type: Package
 Title: Access to the OpenElectricity API via R
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
   person("Ryan", "Batchelor", role = c("aut", "cre"), email = "ryanbatchelor87@gmail.com"))
 Maintainer: Ryan Batchelor <ryanbatchelor87@gmail.com>
